@@ -37,20 +37,46 @@ init_signal_handler()
 	sigaction (SIGWINCH, &act, NULL);
 }
 
+WINDOW *
+create_newwin (int height, int width, int starty, int startx)
+{
+	WINDOW *local_win;
+
+	local_win = newwin (height, width, starty, startx);
+	box (local_win, 0 , 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
+	wrefresh (local_win);		/* Show that box */
+
+	return local_win;
+}
+
 int
 main ()
 {
-	initscr (); /* Start curses mode */
+	WINDOW *main_win = initscr (); /* start curses */
 
 	init_signal_handler();
 
+	WINDOW *my_win;
+	int startx, starty, width, height;
+
+	height = 30;
+	width = 60;
+	starty = (LINES - height) / 2;
+	startx = (COLS - width) / 2;
+
+	my_win = create_newwin (height, width, starty, startx);
+	// scrollok (my_win, 1);
+	// refresh();
+
 	int i;
 	for (i = 0; i < 30; i++) {
-		printf ("screen %dx%d\r\n", COLS, LINES);
+		// werase (my_win);
+		wprintw (my_win, "screen %dx%d\n", COLS, LINES);
+		wrefresh (my_win);
 		sleep (1);
 	}
 
-	endwin (); /* End curses mode */
+	endwin (); /* end curses */
 	return 0;
 }
 
