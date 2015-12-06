@@ -9,35 +9,30 @@
 
 FILE *flog = NULL;
 
+void (*old_winch) (int) = NULL;
+
 void
 catcher (int sig)
 {
-	LINES = -1;
-	COLS  = -1;
+	old_winch (sig);
 
-	int fd = open ("/dev/tty", O_RDONLY);
-	if (fd != -1) {
-		struct winsize w;
-		if (ioctl (fd, TIOCGWINSZ, &w) != -1) {
-			LINES = w.ws_row;
-			COLS  = w.ws_col;
-			fprintf (flog, "Screen %dx%d\n", COLS, LINES);
-		}
-		close (fd);
-	}
+	fprintf (flog, "Screen %dx%d\n", COLS, LINES);
 }
 
 void
 init_signal_handler()
 {
 	struct sigaction act;
+	struct sigaction old;
 
 	sigemptyset (&act.sa_mask);
 
 	act.sa_flags = 0;
 	act.sa_handler = catcher;
 
-	sigaction (SIGWINCH, &act, NULL);
+	sigaction (SIGWINCH, &act, &old);
+
+	old_winch = old.sa_handler;
 }
 
 WINDOW *
@@ -65,10 +60,8 @@ main ()
 	init_pair(2, COLOR_GREEN, COLOR_BLACK);
 	init_pair(3, COLOR_BLUE,  COLOR_BLACK);
 
-	// init_signal_handler();
+	init_signal_handler();
 
-	// int i;
-	// for (i = 0; i < 30; i++) {
 	while (1) {
 		WINDOW *win1, *win2, *win3;
 		int x, y, w, h;
