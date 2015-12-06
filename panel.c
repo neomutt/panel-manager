@@ -41,11 +41,12 @@ init_signal_handler()
 }
 
 WINDOW *
-create_newwin (int height, int width, int y, int x)
+create_newwin (int height, int width, int y, int x, int colour)
 {
 	WINDOW *local_win;
 
 	local_win = newwin (height, width, y, x);
+	wcolor_set (local_win, colour, NULL);
 	box (local_win, 0 , 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
 	wrefresh (local_win);		/* Show that box */
 
@@ -58,6 +59,11 @@ main ()
 	flog = fopen ("/home/mutt/log.txt", "a");
 
 	WINDOW *main_win = initscr (); /*  curses */
+	start_color();
+
+	init_pair(1, COLOR_RED,   COLOR_BLACK);
+	init_pair(2, COLOR_GREEN, COLOR_BLACK);
+	init_pair(3, COLOR_BLUE,  COLOR_BLACK);
 
 	// init_signal_handler();
 
@@ -74,13 +80,13 @@ main ()
 		w = third;
 		h = LINES;
 
-		win1 = create_newwin (h, w, y, x);
+		win1 = create_newwin (h, w, y, x, 1);
 
 		x += third;
-		win2 = create_newwin (h, w, y, x);
+		win2 = create_newwin (h, w, y, x, 2);
 
 		x += third;
-		win3 = create_newwin (h, w, y, x);
+		win3 = create_newwin (h, w, y, x, 3);
 
 		wrefresh (win1);
 		wrefresh (win2);
