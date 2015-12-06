@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+FILE *flog = NULL;
+
 void
 catcher (int sig)
 {
@@ -19,6 +21,7 @@ catcher (int sig)
 		if (ioctl (fd, TIOCGWINSZ, &w) != -1) {
 			LINES = w.ws_row;
 			COLS  = w.ws_col;
+			fprintf (flog, "Screen %dx%d\n", COLS, LINES);
 		}
 		close (fd);
 	}
@@ -38,11 +41,11 @@ init_signal_handler()
 }
 
 WINDOW *
-create_newwin (int height, int width, int starty, int startx)
+create_newwin (int height, int width, int y, int x)
 {
 	WINDOW *local_win;
 
-	local_win = newwin (height, width, starty, startx);
+	local_win = newwin (height, width, y, x);
 	box (local_win, 0 , 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
 	wrefresh (local_win);		/* Show that box */
 
@@ -52,28 +55,51 @@ create_newwin (int height, int width, int starty, int startx)
 int
 main ()
 {
-	WINDOW *main_win = initscr (); /* start curses */
+	flog = fopen ("/home/mutt/log.txt", "a");
 
-	init_signal_handler();
+	WINDOW *main_win = initscr (); /*  curses */
 
-	WINDOW *my_win;
-	int startx, starty, width, height;
+	// init_signal_handler();
 
-	height = 30;
-	width = 60;
-	starty = (LINES - height) / 2;
-	startx = (COLS - width) / 2;
+	// int i;
+	// for (i = 0; i < 30; i++) {
+	while (1) {
+		WINDOW *win1, *win2, *win3;
+		int x, y, w, h;
 
-	my_win = create_newwin (height, width, starty, startx);
-	// scrollok (my_win, 1);
-	// refresh();
+		int third = COLS / 3;
 
-	int i;
-	for (i = 0; i < 30; i++) {
-		// werase (my_win);
-		wprintw (my_win, "screen %dx%d\n", COLS, LINES);
-		wrefresh (my_win);
-		sleep (1);
+		x = 0;
+		y = 0;
+		w = third;
+		h = LINES;
+
+		win1 = create_newwin (h, w, y, x);
+
+		x += third;
+		win2 = create_newwin (h, w, y, x);
+
+		x += third;
+		win3 = create_newwin (h, w, y, x);
+
+		wrefresh (win1);
+		wrefresh (win2);
+		wrefresh (win3);
+		// wrefresh (main_win);
+		sleep (999);
+
+		wborder (win1, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+		wrefresh (win1);
+
+		wborder (win2, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+		wrefresh (win2);
+
+		wborder (win3, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+		wrefresh (win3);
+
+		delwin (win1);
+		delwin (win2);
+		delwin (win3);
 	}
 
 	endwin (); /* end curses */
