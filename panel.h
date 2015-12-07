@@ -2,6 +2,7 @@
 #define _PANEL_H_
 
 #include "rect.h"
+#include "bool.h"
 
 typedef enum {
 	O_VERTICAL,
@@ -14,7 +15,7 @@ typedef struct _box {
 	struct _box **children;
 	int count;
 	Orientation orient;
-	int visible;
+	BOOL visible;
 	Rect computed;
 	int min_size;
 	int max_size;
