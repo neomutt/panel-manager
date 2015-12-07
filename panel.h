@@ -1,22 +1,12 @@
 #ifndef _PANEL_H_
 #define _PANEL_H_
 
-typedef struct _rect {
-	int x;
-	int y;
-	int w;
-	int h;
-} Rect;
+#include "rect.h"
 
 typedef enum {
 	O_VERTICAL,
 	O_HORIZONTAL
 } Orientation;
-
-typedef enum {
-	V_VISIBLE,
-	V_HIDDEN
-} Visibility;
 
 typedef struct _box {
 	const char *name;
@@ -24,7 +14,7 @@ typedef struct _box {
 	struct _box **children;
 	int count;
 	Orientation orient;
-	Visibility visible;
+	int visible;
 	Rect computed;
 	int min;
 	int max;
