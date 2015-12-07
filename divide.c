@@ -197,7 +197,11 @@ main ()
 	printf ("\n");
 	dump_boxes (top, 0);
 	printf ("\n");
-	printf ("Leftover space at (%d,%d) size %dx%d\n", space.x, space.y, space.w, space.h);
+	if ((space.w > 0) && (space.h > 0)) {
+		printf ("Leftover space at (%d,%d) size %dx%d\n", space.x, space.y, space.w, space.h);
+	} else {
+		printf ("No space left over\n");
+	}
 	printf ("\n");
 
 	free_box (top);
