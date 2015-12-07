@@ -3,6 +3,38 @@
 
 #include "panel.h"
 
+BOOL
+delete_box (Box *b)
+{
+	if (!b)
+		return FALSE;
+
+	Box *parent = b->parent;
+	if (!parent)
+		return FALSE;
+
+	int i;
+	int match = -1;
+	for (i = 0; i < parent->count; i++) {
+		if (parent->children[i] == b) {
+			match = i;
+			break;
+		}
+	}
+
+	if (match < 0)
+		return FALSE;
+
+	parent->count--;
+	for (i = match; i < parent->count; i++) {
+		parent->children[i] = parent->children[i+1];
+	}
+
+	parent->children = realloc (parent->children, (parent->count * sizeof (Box*)));
+
+	return TRUE;
+}
+
 void
 dump_boxes (Box *b, int indent)
 {
