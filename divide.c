@@ -4,6 +4,27 @@
 #include "panel.h"
 
 void
+dump_boxes (Box *b, int indent)
+{
+	if (!b)
+		return;
+
+	printf ("%*s%c %-10s %d,%d %dx%d\n",
+		indent*4, "",
+		(b->orient == O_VERTICAL) ? 'V' : 'H',
+		b->name,
+		b->computed.x,
+		b->computed.y,
+		b->computed.w,
+		b->computed.h);
+
+	int i;
+	for (i = 0; i < b->count; i++) {
+		dump_boxes (b->children[i], indent + 1);
+	}
+}
+
+void
 set_size (Box *b, Rect *r)
 {
 	if (!b || !r)
@@ -12,33 +33,21 @@ set_size (Box *b, Rect *r)
 	b->computed.x = r->x;
 	b->computed.y = r->y;
 
+	// printf ("Rect: %d,%d %dx%d\n", r->x, r->y, r->w, r->h);
 	if (b->visible == V_HIDDEN) {
 		b->computed.w = r->w;	// Claim all the space
 		b->computed.h = r->h;
+		// printf ("\t%s HIDDEN %d,%d %dx%d\n", b->name, b->computed.x, b->computed.y, b->computed.w, b->computed.h);
 
 		// Leave original Rect (r) unchanged
 
+		// printf ("\t%s %d children\n", b->name, b->count);
 		int i;
 		for (i = 0; i < b->count; i++) {
 			set_size (b->children[i], r);
 		}
 	} else if (b->orient == O_VERTICAL) {
-		if (b->min > r->h) {
-			b->computed.x = -1;	// Too little height
-			b->computed.y = -1;
-			b->computed.w = -1;
-			b->computed.h = -1;
-			return;
-		}
-
-		if (b->max < r->h) {
-			r->y += b->max;
-			r->h -= b->max;
-		} else {
-			r->y += r->h;		// Take all the height
-			r->h  = 0;
-		}
-	} else {
+		// printf ("\t%s VERTICAL min %d, max %d\n", b->name, b->min, b->max);
 		if (b->min > r->w) {
 			b->computed.x = -1;	// Too little width
 			b->computed.y = -1;
@@ -47,14 +56,57 @@ set_size (Box *b, Rect *r)
 			return;
 		}
 
-		if (b->max < r->w) {
+		if (b->max < 0) {
+			b->computed.w = r->w;
+			b->computed.h = r->h;
+
+			r->x += r->w;
+			r->w  = 0;
+		} else if (b->max < r->w) {
+			b->computed.w = b->max;
+			b->computed.h = r->h;
+
 			r->x += b->max;
 			r->w -= b->max;
 		} else {
-			r->x += r->h;		// Take all the height
+			b->computed.w = r->w;
+			b->computed.h = r->h;
+
+			r->x += r->w;
 			r->w  = 0;
 		}
+	} else {
+		// printf ("\t%s HORIZONTAL min %d, max %d\n", b->name, b->min, b->max);
+		if (b->min > r->h) {
+			b->computed.x = -1;	// Too little height
+			b->computed.y = -1;
+			b->computed.w = -1;
+			b->computed.h = -1;
+			return;
+		}
+
+		if (b->max < 0) {
+			b->computed.w = r->w;
+			b->computed.h = r->h;
+
+			r->y += r->h;
+			r->h  = 0;
+		} else if (b->max < r->h) {
+			b->computed.w = r->w;
+			b->computed.h = b->max;
+
+			r->y += b->max;
+			r->h -= b->max;
+		} else {
+			b->computed.w = r->w;
+			b->computed.h = r->h;
+
+			r->y += r->h;
+			r->h  = 0;
+		}
 	}
+
+	// printf ("\t%s CHOSEN %d,%d %dx%d\n", b->name, b->computed.x, b->computed.y, b->computed.w, b->computed.h);
 }
 
 void
@@ -142,7 +194,11 @@ main ()
 	Rect space = { 0, 0, 140, 30 };
 	set_size (top, &space);
 
+	printf ("\n");
+	dump_boxes (top, 0);
+	printf ("\n");
 	printf ("Leftover space at (%d,%d) size %dx%d\n", space.x, space.y, space.w, space.h);
+	printf ("\n");
 
 	free_box (top);
 	return 0;
