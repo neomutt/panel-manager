@@ -35,6 +35,28 @@ delete_box (Box *b)
 	return TRUE;
 }
 
+BOOL
+insert_box (Box *parent, Box *b, int index)
+{
+	if (!parent || !b)
+		return FALSE;
+
+	if ((index < 0) || (index > parent->count))
+		return FALSE;
+
+	parent->count++;
+	parent->children = realloc (parent->children, (parent->count * sizeof (Box*)));
+
+	int i;
+	for (i = (parent->count-1); i > index; i--) {
+		parent->children[i] = parent->children[i-1];
+	}
+
+	parent->children[index] = b;
+
+	return TRUE;
+}
+
 void
 dump_boxes (Box *b, int indent)
 {
