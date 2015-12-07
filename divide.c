@@ -46,7 +46,7 @@ set_size (Box *b, Rect *r)
 
 	// printf ("Rect: %d,%d %dx%d\n", r->x, r->y, r->w, r->h);
 	if (!b->visible) {
-		// printf ("\t%s HIDDEN min %d, max %d\n", b->name, b->min, b->max);
+		// printf ("\t%s HIDDEN min %d, max %d\n", b->name, b->min_size, b->max_size);
 		b->computed.w = r->w;	// Claim all the space
 		b->computed.h = r->h;
 
@@ -67,16 +67,16 @@ set_size (Box *b, Rect *r)
 			if (!child->visible && (child->count == 0))
 				continue;
 
-			if (child->max < 0) {
-				max += child->min;
+			if (child->max_size < 0) {
+				max += child->min_size;
 				if (filler >= 0) {
 					// ERROR, but allow it *some* space
 					printf ("ERROR: multiple expanders: %s, %s\n", b->children[filler]->name, child->name);
-					b->max = b->min;
+					b->max_size = b->min_size;
 				}
 				filler = i;
 			} else {
-				max += child->max;
+				max += child->max_size;
 			}
 		}
 
@@ -91,7 +91,7 @@ set_size (Box *b, Rect *r)
 				// Temporarily lie about the remaining space
 				if (b->orient == O_VERTICAL) {
 					int old = s.h;
-					int size = (total - max + b->min);
+					int size = (total - max + b->min_size);
 					s.h = size;
 					// printf ("\tallowing %d rows\n", s.h);
 					set_size (b->children[i], &s);
@@ -100,7 +100,7 @@ set_size (Box *b, Rect *r)
 					s.y += size;
 				} else {
 					int old = s.w;
-					int size = (total - max + b->min);
+					int size = (total - max + b->min_size);
 					s.w = size;
 					// printf ("\tallowing %d columns\n", s.w);
 					set_size (b->children[i], &s);
@@ -117,8 +117,8 @@ set_size (Box *b, Rect *r)
 			// printf ("ADJUST\n");
 		}
 	} else if (b->orient == O_VERTICAL) {
-		// printf ("\t%s VERTICAL min %d, max %d\n", b->name, b->min, b->max);
-		if (b->min > r->w) {
+		// printf ("\t%s VERTICAL min %d, max %d\n", b->name, b->min_size, b->max_size);
+		if (b->min_size > r->w) {
 			b->computed.x = -1;	// Too little width
 			b->computed.y = -1;
 			b->computed.w = -1;
@@ -126,22 +126,22 @@ set_size (Box *b, Rect *r)
 			return;
 		}
 
-		if (b->max < 0) {
-			if (b->min > 0) {
-				b->computed.w = b->min;
-				r->x += b->min;
+		if (b->max_size < 0) {
+			if (b->min_size > 0) {
+				b->computed.w = b->min_size;
+				r->x += b->min_size;
 			} else {
 				b->computed.w = 0;
 			}
 			b->computed.h = r->h;
 
 			r->w  = 0;
-		} else if (b->max < r->w) {
-			b->computed.w = b->max;
+		} else if (b->max_size < r->w) {
+			b->computed.w = b->max_size;
 			b->computed.h = r->h;
 
-			r->x += b->max;
-			r->w -= b->max;
+			r->x += b->max_size;
+			r->w -= b->max_size;
 		} else {
 			b->computed.w = r->w;
 			b->computed.h = r->h;
@@ -150,8 +150,8 @@ set_size (Box *b, Rect *r)
 			r->w  = 0;
 		}
 	} else {
-		// printf ("\t%s HORIZONTAL min %d, max %d\n", b->name, b->min, b->max);
-		if (b->min > r->h) {
+		// printf ("\t%s HORIZONTAL min %d, max %d\n", b->name, b->min_size, b->max_size);
+		if (b->min_size > r->h) {
 			b->computed.x = -1;	// Too little height
 			b->computed.y = -1;
 			b->computed.w = -1;
@@ -159,22 +159,22 @@ set_size (Box *b, Rect *r)
 			return;
 		}
 
-		if (b->max < 0) {
-			if (b->min > 0) {
-				b->computed.h = b->min;
-				r->y += b->min;
+		if (b->max_size < 0) {
+			if (b->min_size > 0) {
+				b->computed.h = b->min_size;
+				r->y += b->min_size;
 			} else {
 				b->computed.h = 0;
 			}
 			b->computed.w = r->w;
 
 			r->h  = 0;
-		} else if (b->max < r->h) {
+		} else if (b->max_size < r->h) {
 			b->computed.w = r->w;
-			b->computed.h = b->max;
+			b->computed.h = b->max_size;
 
-			r->y += b->max;
-			r->h -= b->max;
+			r->y += b->max_size;
+			r->h -= b->max_size;
 		} else {
 			b->computed.w = r->w;
 			b->computed.h = r->h;
@@ -232,8 +232,8 @@ new_box (const char *name, Box *parent, Orientation orient, int visible, int min
 	b->count    = 0;
 	b->orient   = orient;
 	b->visible  = visible;
-	b->min      = min;
-	b->max      = max;
+	b->min_size = min;
+	b->max_size = max;
 
 	b->computed.x = -1;
 	b->computed.y = -1;

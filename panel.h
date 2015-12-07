@@ -16,8 +16,8 @@ typedef struct _box {
 	Orientation orient;
 	int visible;
 	Rect computed;
-	int min;
-	int max;
+	int min_size;
+	int max_size;
 } Box;
 
 #endif /* _PANEL_H_ */
