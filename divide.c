@@ -9,7 +9,18 @@ dump_boxes (Box *b, int indent)
 	if (!b)
 		return;
 
-	printf ("%*s%c %-10s %d,%d %dx%d\n",
+	int colour = 32;	// Default: green
+
+	if (!b->visible) {
+		if (b->count == 0) {
+			colour = 31;	// Hidden: red
+		} else {
+			colour = 30;	// Structure: grey
+		}
+	}
+
+	printf ("\033[1;%dm%*s%c %-10s %d,%d %dx%d\033[m\n",
+		colour,
 		indent*4, "",
 		(b->orient == O_VERTICAL) ? 'V' : 'H',
 		b->name,
@@ -245,7 +256,7 @@ main ()
 	Box *middle   =       new_box ("middle",   top,     O_HORIZONTAL, 0,    1,  -1);
 	/* Box *status   = */ new_box ("status",   top,     O_HORIZONTAL, 1,    1,   1);
 
-	/* Box *sidebar  = */ new_box ("sidebar",  middle,  O_VERTICAL,   1,   20,  20);
+	Box *sidebar  =       new_box ("sidebar",  middle,  O_VERTICAL,   1,   20,  20);
 	Box *right    =       new_box ("right",    middle,  O_VERTICAL,   0,    1,  -1);
 
 	/* Box *index    = */ new_box ("index",    right,   O_HORIZONTAL, 1,   10,  10);
@@ -255,7 +266,21 @@ main ()
 	Rect space = { 0, 0, 140, 30 };
 	set_size (top, &space);
 
+	dump_boxes (top, 0);
 	printf ("\n");
+
+	// index->visible = 0;
+	// set_size (top, &space);
+	// dump_boxes (top, 0);
+	// printf ("\n");
+
+	sidebar->visible = 0;
+	set_size (top, &space);
+	dump_boxes (top, 0);
+	printf ("\n");
+
+	sidebar->visible = 1;
+	set_size (top, &space);
 	dump_boxes (top, 0);
 	printf ("\n");
 
