@@ -19,6 +19,7 @@ typedef enum {
 } Visibility;
 
 typedef struct _box {
+	const char *name;
 	struct _box *parent;
 	struct _box **children;
 	int count;

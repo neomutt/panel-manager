@@ -9,6 +9,52 @@ set_size (Box *b, Rect *r)
 	if (!b || !r)
 		return;
 
+	b->computed.x = r->x;
+	b->computed.y = r->y;
+
+	if (b->visible == V_HIDDEN) {
+		b->computed.w = r->w;	// Claim all the space
+		b->computed.h = r->h;
+
+		// Leave original Rect (r) unchanged
+
+		int i;
+		for (i = 0; i < b->count; i++) {
+			set_size (b->children[i], r);
+		}
+	} else if (b->orient == O_VERTICAL) {
+		if (b->min > r->h) {
+			b->computed.x = -1;	// Too little height
+			b->computed.y = -1;
+			b->computed.w = -1;
+			b->computed.h = -1;
+			return;
+		}
+
+		if (b->max < r->h) {
+			r->y += b->max;
+			r->h -= b->max;
+		} else {
+			r->y += r->h;		// Take all the height
+			r->h  = 0;
+		}
+	} else {
+		if (b->min > r->w) {
+			b->computed.x = -1;	// Too little width
+			b->computed.y = -1;
+			b->computed.w = -1;
+			b->computed.h = -1;
+			return;
+		}
+
+		if (b->max < r->w) {
+			r->x += b->max;
+			r->w -= b->max;
+		} else {
+			r->x += r->h;		// Take all the height
+			r->w  = 0;
+		}
+	}
 }
 
 void
@@ -44,12 +90,13 @@ add_child (Box *parent, Box *b)
 }
 
 Box *
-new_box (Box *parent, Orientation orient, Visibility visible, int min, int max)
+new_box (const char *name, Box *parent, Orientation orient, Visibility visible, int min, int max)
 {
 	Box *b = malloc (sizeof (Box));
 	if (!b)
 		return NULL;
 
+	b->name     = name;
 	b->parent   = parent;
 	b->children = NULL;
 	b->count    = 0;
@@ -73,27 +120,29 @@ new_box (Box *parent, Orientation orient, Visibility visible, int min, int max)
 int
 main ()
 {
-	Box *top      = new_box (NULL,   O_VERTICAL,   V_HIDDEN,   -1,  -1);
+	Box *top      = new_box ("top",      NULL,    O_VERTICAL,   V_HIDDEN,    -1,  -1);
 
 	// Box *helpline =
-			new_box (top,    O_HORIZONTAL, V_VISIBLE,   1,   1);
-	Box *middle   = new_box (top,    O_HORIZONTAL, V_HIDDEN,   -1,  -1);
+			new_box ("helpline", top,     O_HORIZONTAL, V_VISIBLE,    1,   1);
+	Box *middle   = new_box ("middle",   top,     O_HORIZONTAL, V_HIDDEN,    -1,  -1);
 	// Box *status   =
-			new_box (top,    O_HORIZONTAL, V_VISIBLE,   1,   1);
+			new_box ("status",   top,     O_HORIZONTAL, V_VISIBLE,    1,   1);
 
 	// Box *sidebar  =
-			new_box (middle, O_VERTICAL,   V_VISIBLE,  30,  30);
-	Box *right    = new_box (middle, O_VERTICAL,   V_HIDDEN,   -1,  -1);
+			new_box ("sidebar",  middle,  O_VERTICAL,   V_VISIBLE,   30,  30);
+	Box *right    = new_box ("right",    middle,  O_VERTICAL,   V_HIDDEN,    -1,  -1);
 
 	// Box *index    =
-			new_box (right,  O_HORIZONTAL, V_VISIBLE,  10,  10);
+			new_box ("index",    right,   O_HORIZONTAL, V_VISIBLE,   10,  10);
 	// Box *pager    =
-			new_box (right,  O_HORIZONTAL, V_VISIBLE,  -1,  -1);
+			new_box ("pager",    right,   O_HORIZONTAL, V_VISIBLE,   -1,  -1);
 	// Box *helppage =
-			new_box (right,  O_HORIZONTAL, V_HIDDEN,   -1,  -1);
+			new_box ("helppage", right,   O_HORIZONTAL, V_HIDDEN,    -1,  -1);
 
 	Rect space = { 0, 0, 140, 30 };
 	set_size (top, &space);
+
+	printf ("Leftover space at (%d,%d) size %dx%d\n", space.x, space.y, space.w, space.h);
 
 	free_box (top);
 	return 0;
