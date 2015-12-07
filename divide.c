@@ -4,6 +4,58 @@
 #include "panel.h"
 
 BOOL
+positions_differ (const Rect *a, const Rect *b)
+{
+	if (!a || !b)
+		return FALSE;
+
+	return ((a->x != b->x) || (a->y != b->y));
+}
+
+BOOL
+sizes_differ (const Rect *a, const Rect *b)
+{
+	if (!a || !b)
+		return FALSE;
+
+	return ((a->w != b->w) || (a->h != b->h));
+}
+
+void
+cb_notify (Box *b, Notification flags)
+{
+	char *s = "SIZE ";
+	char *p = "POSN ";
+	char *v = "VISIBLE ";
+	char *d = "DELETE ";
+
+	printf ("%s has changed: flags: %s%s%s%s\n",
+		b->name,
+		(flags & N_SIZE_CHANGED)    ? s : "",
+		(flags & N_POSN_CHANGED)    ? p : "",
+		(flags & N_VISIBLE_CHANGED) ? v : "",
+		(flags & N_DELETED)         ? d : "");
+}
+
+void
+notify_delete (Box *b)
+{
+	if (!b)
+		return;
+
+	int i;
+	for (i = 0; i < b->count; i++) {
+		notify_delete (b->children[i]);
+	}
+
+	Rect dead = { -1, -1, -1, -1 };
+
+	b->computed = dead;
+	b->notify (b, N_DELETED);
+	b->old_computed = dead;
+}
+
+BOOL
 delete_box (Box *b)
 {
 	if (!b)
@@ -31,6 +83,9 @@ delete_box (Box *b)
 	}
 
 	parent->children = realloc (parent->children, (parent->count * sizeof (Box*)));
+
+	notify_delete (b);
+	b->parent = NULL;
 
 	return TRUE;
 }
@@ -94,6 +149,10 @@ set_size (Box *b, Rect *r)
 {
 	if (!b || !r)
 		return;
+
+	Notification flags = 0;
+	b->old_computed = b->computed;
+	b->old_visible  = b->visible;
 
 	b->computed.x = r->x;
 	b->computed.y = r->y;
@@ -177,10 +236,8 @@ set_size (Box *b, Rect *r)
 			b->computed.y = -1;
 			b->computed.w = -1;
 			b->computed.h = -1;
-			return;
-		}
-
-		if (b->max_size < 0) {
+			flags |= N_TOO_LITTLE_SPACE;
+		} else if (b->max_size < 0) {
 			if (b->min_size > 0) {
 				b->computed.w = b->min_size;
 				r->x += b->min_size;
@@ -210,10 +267,8 @@ set_size (Box *b, Rect *r)
 			b->computed.y = -1;
 			b->computed.w = -1;
 			b->computed.h = -1;
-			return;
-		}
-
-		if (b->max_size < 0) {
+			flags |= N_TOO_LITTLE_SPACE;
+		} else if (b->max_size < 0) {
 			if (b->min_size > 0) {
 				b->computed.h = b->min_size;
 				r->y += b->min_size;
@@ -236,6 +291,20 @@ set_size (Box *b, Rect *r)
 			r->y += r->h;
 			r->h  = 0;
 		}
+	}
+
+	if (b->visible != b->old_visible) {
+		flags |= N_VISIBLE_CHANGED;
+	}
+	if (positions_differ (&b->computed, &b->old_computed)) {
+		flags |= N_POSN_CHANGED;
+	}
+	if (sizes_differ (&b->computed, &b->old_computed)) {
+		flags |= N_SIZE_CHANGED;
+	}
+
+	if (flags != 0) {
+		b->notify (b, flags);
 	}
 
 	// printf ("\t%s CHOSEN %d,%d %dx%d\n", b->name, b->computed.x, b->computed.y, b->computed.w, b->computed.h);
@@ -289,10 +358,19 @@ new_box (const char *name, Box *parent, Orientation orient, int visible, int min
 	b->min_size = min;
 	b->max_size = max;
 
+	b->notify   = cb_notify;
+
 	b->computed.x = -1;
 	b->computed.y = -1;
 	b->computed.w = -1;
 	b->computed.h = -1;
+
+	b->old_visible  = visible;
+
+	b->old_computed.x = -1;
+	b->old_computed.y = -1;
+	b->old_computed.w = -1;
+	b->old_computed.h = -1;
 
 	if (parent) {
 		add_child (parent, b);
@@ -308,26 +386,38 @@ main ()
 
 	/* Box *helpline = */ new_box ("helpline", top,     O_HORIZONTAL, 1,    1,   1);
 	Box *middle   =       new_box ("middle",   top,     O_HORIZONTAL, 0,    1,  -1);
+#if 0
+	/* Box *index    = */ new_box ("dummy1",   top,     O_HORIZONTAL, 1,    5,   5);
+	/* Box *index    = */ new_box ("dummy2",   top,     O_HORIZONTAL, 1,    5,   5);
+	/* Box *index    = */ new_box ("dummy3",   top,     O_HORIZONTAL, 1,    5,   5);
+#endif
 	/* Box *status   = */ new_box ("status",   top,     O_HORIZONTAL, 1,    1,   1);
 
+#if 1
 	Box *sidebar  =       new_box ("sidebar",  middle,  O_VERTICAL,   1,   20,  20);
 	Box *right    =       new_box ("right",    middle,  O_VERTICAL,   0,    1,  -1);
 
 	/* Box *index    = */ new_box ("index",    right,   O_HORIZONTAL, 1,   10,  10);
 	/* Box *pager    = */ new_box ("pager",    right,   O_HORIZONTAL, 1,    1,  -1);
 	/* Box *helppage = */ new_box ("helppage", right,   O_HORIZONTAL, 0,    1,  -1);
+#endif
 
 	Rect space = { 0, 0, 140, 30 };
+	set_size (top, &space);
+
 	set_size (top, &space);
 
 	dump_boxes (top, 0);
 	printf ("\n");
 
-	// index->visible = 0;
-	// set_size (top, &space);
-	// dump_boxes (top, 0);
-	// printf ("\n");
+#if 0
+	index->visible = 0;
+	set_size (top, &space);
+	dump_boxes (top, 0);
+	printf ("\n");
+#endif
 
+#if 0
 	sidebar->visible = 0;
 	set_size (top, &space);
 	dump_boxes (top, 0);
@@ -337,6 +427,19 @@ main ()
 	set_size (top, &space);
 	dump_boxes (top, 0);
 	printf ("\n");
+#endif
+#if 1
+	delete_box (sidebar);
+	set_size (top, &space);
+	dump_boxes (top, 0);
+	printf ("\n");
+#endif
+#if 1
+	insert_box (middle, sidebar, middle->count);
+	set_size (top, &space);
+	dump_boxes (top, 0);
+	printf ("\n");
+#endif
 
 	free_box (top);
 	return 0;

@@ -3,6 +3,7 @@
 
 #include "rect.h"
 #include "bool.h"
+#include "notify.h"
 
 typedef enum {
 	O_VERTICAL,
@@ -19,6 +20,9 @@ typedef struct _box {
 	Rect computed;
 	int min_size;
 	int max_size;
+	BOOL old_visible;
+	Rect old_computed;
+	cb_notify_t notify;
 } Box;
 
 #endif /* _PANEL_H_ */
