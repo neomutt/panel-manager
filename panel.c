@@ -6,6 +6,7 @@
 void
 cb_notify (Panel *b, Notification flags)
 {
+#if 0
 	char *s = "SIZE ";
 	char *p = "POSN ";
 	char *v = "VISIBLE ";
@@ -17,6 +18,7 @@ cb_notify (Panel *b, Notification flags)
 		(flags & N_POSN_CHANGED)    ? p : "",
 		(flags & N_VISIBLE_CHANGED) ? v : "",
 		(flags & N_DELETED)         ? d : "");
+#endif
 }
 
 void

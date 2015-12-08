@@ -74,3 +74,10 @@ gfx_close_window (WINDOW *win)
 	delwin (win);
 }
 
+void
+gfx_print (WINDOW *win, const char *msg)
+{
+	wprintw (win, msg);
+	wrefresh (win);
+}
+

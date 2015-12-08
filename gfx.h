@@ -13,5 +13,6 @@ Rect gfx_get_rect (WINDOW *win);
 WINDOW * gfx_create_newwin (int height, int width, int y, int x, int colour);
 void gfx_wipe_window (WINDOW *win);
 void gfx_close_window (WINDOW *win);
+void gfx_print (WINDOW *win, const char *msg);
 
 #endif /* _GFX_H_ */
