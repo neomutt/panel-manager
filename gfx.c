@@ -4,12 +4,12 @@
 #include "rect.h"
 
 Rect
-gfx_get_window (WINDOW *win)
+gfx_get_rect (WINDOW *win)
 {
 	if (win) {
 	}
 
-	Rect r = { -1, -1, -1, -1 };
+	Rect r = { 0, 0, COLS, LINES };
 	return r;
 }
 

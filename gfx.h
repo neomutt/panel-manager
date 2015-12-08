@@ -8,7 +8,7 @@ typedef struct _w WINDOW;
 void gfx_init     (void);
 void gfx_shutdown (void);
 
-Rect gfx_get_window (WINDOW *win);
+Rect gfx_get_rect (WINDOW *win);
 
 WINDOW * gfx_create_newwin (int height, int width, int y, int x, int colour);
 void gfx_wipe_window (WINDOW *win);

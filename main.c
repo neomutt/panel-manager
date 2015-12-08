@@ -89,12 +89,12 @@ main ()
 
 	signal_init_handlers();
 
-	Rect r = gfx_get_window (NULL);
-
-	int COLS  = r.w;
-	int LINES = r.h;
-
 	while (1) {
+		Rect r = gfx_get_rect (NULL);
+
+		int COLS  = r.w;
+		int LINES = r.h;
+
 		WINDOW *win1, *win2, *win3;
 		int x, y, w, h;
 
