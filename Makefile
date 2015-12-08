@@ -16,6 +16,8 @@ OBJ	= $(SRC:%.c=$(OBJDIR)/%.o)
 CFLAGS	+= -Wall
 CFLAGS	+= -Wextra
 CFLAGS	+= -Wpedantic
+CFLAGS	+= -g
+
 LDFLAGS	+= -pthread
 LDFLAGS	+= -rdynamic
 
