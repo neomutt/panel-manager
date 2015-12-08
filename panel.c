@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "panel.h"
+#include "log.h"
 
 void
 cb_notify (Panel *b, Notification flags)
@@ -10,19 +11,18 @@ cb_notify (Panel *b, Notification flags)
 		return;
 
 	b->redraws++;
-#if 0
+
 	char *s = "SIZE ";
 	char *p = "POSN ";
 	char *v = "VISIBLE ";
 	char *d = "DELETE ";
 
-	printf ("%s has changed: flags: %s%s%s%s\n",
+	log_message ("%s has changed: flags: %s%s%s%s\n",
 		b->name,
 		(flags & N_SIZE_CHANGED)    ? s : "",
 		(flags & N_POSN_CHANGED)    ? p : "",
 		(flags & N_VISIBLE_CHANGED) ? v : "",
 		(flags & N_DELETED)         ? d : "");
-#endif
 }
 
 

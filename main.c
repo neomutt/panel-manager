@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <unistd.h>
 
 #include "bool.h"
 #include "panel.h"
@@ -53,8 +52,7 @@ main (int argc, char *argv[])
 	Panel *st = top->children[2];
 
 	BOOL finished = FALSE;
-	int r_count = 0;
-	BOOL repaint = FALSE;
+	int repaints = 0;
 	Rect old = { -1, -1, -1, -1 };
 
 	WINDOW *win1 = NULL;
@@ -65,16 +63,10 @@ main (int argc, char *argv[])
 
 	while (!finished) {
 		Rect r = gfx_get_rect (NULL);
-		log_message ("Rect: %d,%d %dx%d\n", r.x, r.y, r.w, r.h);
 
 		if (rect_sizes_differ (&old, &r)) {
-			log_message ("Rects changed\n");
 			old = r;
-			repaint = TRUE;
-		}
 
-		if (repaint) {
-			log_message ("wipe start\n");
 			gfx_wipe_window (win1);
 			gfx_wipe_window (win2);
 			gfx_wipe_window (win3);
@@ -86,65 +78,28 @@ main (int argc, char *argv[])
 			gfx_close_window (win3);
 			gfx_close_window (win4);
 			gfx_close_window (win5);
-			log_message ("wipe end\n");
 
-			r_count++;
-			log_message ("Repaints = %d\n", r_count);
+			repaints++;
 
 			set_size (top, &r);
 
-			log_message ("create start\n");
 			win1 = gfx_create_window (&hl->computed, 1);
 			win2 = gfx_create_window (&sb->computed, 2);
 			win3 = gfx_create_window (&in->computed, 3);
 			win4 = gfx_create_window (&pg->computed, 4);
 			win5 = gfx_create_window (&st->computed, 5);
-			log_message ("create end\n");
 
-			log_message ("print start\n");
 			gfx_print (win1, hl->name, hl->redraws);
 			gfx_print (win2, sb->name, sb->redraws);
-			gfx_print (win3, in->name, r_count);
+			gfx_print (win3, in->name, in->redraws);
 			gfx_print (win4, pg->name, pg->redraws);
 			gfx_print (win5, st->name, st->redraws);
-			log_message ("print end\n");
-
-			repaint = FALSE;
 		}
 
+		// This will block until a key is pressed, or a signal is received.
 		int ch = gfx_get_char (win5);
-		if (ch == 'q')
+		if ((ch == 'q') || (ch < 0))
 			break;
-
-		if (usleep (100000) != 0) {
-			repaint = TRUE;
-		}
-#if 0
-		while (1) {
-			log_message (".");
-			int ch = gfx_get_char();
-			if (ch == 'q') {
-				log_message ("q pressed\n");
-				finished = TRUE;
-				break;
-			} else if (ch == 'r') {
-				log_message ("r pressed\n");
-				break;
-			} else if (ch == -1) {
-				// sleep (1);
-				// break;
-			}
-			// usleep (100000);
-
-			if (usleep (100000) != 0) {
-				log_message ("usleep interrupted\n");
-				break;
-			}
-		}
-
-		log_message ("\n");
-#endif
-
 	}
 
 	gfx_shutdown();

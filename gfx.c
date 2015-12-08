@@ -48,13 +48,11 @@ gfx_create_window (Rect *r, int colour)
 void
 gfx_init (void)
 {
-	WINDOW *main_win =
-	initscr ();
+	WINDOW *main_win = initscr ();
 	init_colours ();
 	cbreak();
 	noecho();
-	nodelay (main_win, TRUE);
-	// halfdelay (1);
+	nodelay (main_win, FALSE);
 }
 
 void
@@ -92,9 +90,10 @@ gfx_print (WINDOW *win, const char *msg, int redraw)
 int
 gfx_get_char (WINDOW *win)
 {
-	if (win)
+	if (win) {
 		return wgetch (win);
-	else
+	} else {
 		return getch();
+	}
 }
 
