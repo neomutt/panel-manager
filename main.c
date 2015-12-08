@@ -21,8 +21,7 @@ create_panels (void)
 
 				new_panel ("index",    right,  O_HORIZONTAL, TRUE,  10,  10);
 				new_panel ("pager",    right,  O_HORIZONTAL, TRUE,   1,  -1);
-				new_panel ("helppage", right,  O_HORIZONTAL, FALSE,  1,  -1);
-
+				// new_panel ("helppage", right,  O_HORIZONTAL, FALSE,  1,  -1);
 	return top;
 }
 
@@ -60,7 +59,7 @@ main ()
 		gfx_print (win4, pg->name);
 		gfx_print (win5, st->name);
 
-		sleep (999);
+		sleep (999);	// Wait until we receive a signal, e.g. SIGWINCH
 
 		gfx_wipe_window (win1);
 		gfx_wipe_window (win2);

@@ -6,7 +6,6 @@
 void
 cb_notify (Panel *b, Notification flags)
 {
-#if 0
 	char *s = "SIZE ";
 	char *p = "POSN ";
 	char *v = "VISIBLE ";
@@ -18,7 +17,6 @@ cb_notify (Panel *b, Notification flags)
 		(flags & N_POSN_CHANGED)    ? p : "",
 		(flags & N_VISIBLE_CHANGED) ? v : "",
 		(flags & N_DELETED)         ? d : "");
-#endif
 }
 
 void
@@ -222,14 +220,10 @@ set_size (Panel *b, Rect *r)
 			b->computed.h = -1;
 			flags |= N_TOO_LITTLE_SPACE;
 		} else if (b->max_size < 0) {
-			if (b->min_size > 0) {
-				b->computed.w = b->min_size;
-				r->x += b->min_size;
-			} else {
-				b->computed.w = 0;
-			}
+			b->computed.w = r->w;
 			b->computed.h = r->h;
 
+			r->x += r->w;
 			r->w  = 0;
 		} else if (b->max_size < r->w) {
 			b->computed.w = b->max_size;
@@ -253,14 +247,10 @@ set_size (Panel *b, Rect *r)
 			b->computed.h = -1;
 			flags |= N_TOO_LITTLE_SPACE;
 		} else if (b->max_size < 0) {
-			if (b->min_size > 0) {
-				b->computed.h = b->min_size;
-				r->y += b->min_size;
-			} else {
-				b->computed.h = 0;
-			}
 			b->computed.w = r->w;
+			b->computed.h = r->h;
 
+			r->y += r->h;
 			r->h  = 0;
 		} else if (b->max_size < r->h) {
 			b->computed.w = r->w;
