@@ -81,9 +81,9 @@ gfx_close_window (WINDOW *win)
 }
 
 void
-gfx_print (WINDOW *win, const char *msg, int redraw)
+gfx_print (WINDOW *win, const char *msg)
 {
-	wprintw (win, "%s: %d", msg, redraw);
+	wprintw (win, "%s", msg);
 	wrefresh (win);
 }
 

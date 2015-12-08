@@ -44,7 +44,7 @@ draw_window (WINDOW **win, Panel *pan, int colour)
 	if (pan->visible) {
 		log_message ("%s visible\n", pan->name);
 		*win = gfx_create_window (&(pan->computed), colour);
-		gfx_print (*win, pan->name, pan->redraws);
+		gfx_print (*win, pan->name);
 	} else {
 		log_message ("%s hidden\n", pan->name);
 		*win = NULL;
@@ -70,8 +70,6 @@ exchange_sidebar (Panel *pan)
 		}
 	}
 
-	log_message ("found sidebar %d\n", index);
-
 	if (index < 0)
 		return;
 
@@ -87,7 +85,7 @@ exchange_sidebar (Panel *pan)
 int
 main (int argc, char *argv[])
 {
-	const char *log_file = "/home/mutt/log.txt";
+	const char *log_file = "log.txt";
 
 	if (argc > 1) {
 		log_file = argv[1];

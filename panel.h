@@ -23,7 +23,6 @@ typedef struct _panel {
 	BOOL old_visible;
 	Rect old_computed;
 	cb_notify_t notify;
-	int redraws;
 } Panel;
 
 Panel * panel_new         (const char *name, Panel *parent, Orientation orient, int visible, int min, int max);

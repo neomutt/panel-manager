@@ -11,8 +11,6 @@ cb_notify (Panel *b, Notification flags)
 	if (!b || (flags == 0))
 		return;
 
-	b->redraws++;
-
 	char *s = "SIZE ";
 	char *p = "POSN ";
 	char *v = "VISIBLE ";
@@ -148,9 +146,7 @@ panel_set_size (Panel *b, Rect *r)
 	b->computed.x = r->x;
 	b->computed.y = r->y;
 
-	// printf ("Rect: %d,%d %dx%d\n", r->x, r->y, r->w, r->h);
 	if (!b->visible) {
-		// printf ("\t%s HIDDEN min %d, max %d\n", b->name, b->min_size, b->max_size);
 		b->computed.w = r->w;	// Claim all the space
 		b->computed.h = r->h;
 
@@ -185,11 +181,9 @@ panel_set_size (Panel *b, Rect *r)
 		}
 
 		if (b->count > 0) {
-			// printf ("\t%s: filler = %d, total = %d, max = %d\n", b->name, filler, total, max);
 		}
 
 		Rect s = *r;
-		// printf ("\t%s %d children\n", b->name, b->count);
 		for (i = 0; i < b->count; i++) {
 			if (i == filler) {
 				// Temporarily lie about the remaining space
@@ -197,31 +191,22 @@ panel_set_size (Panel *b, Rect *r)
 					int old = s.h;
 					int size = (total - max + b->min_size);
 					s.h = size;
-					// printf ("\tallowing %d rows\n", s.h);
 					panel_set_size (b->children[i], &s);
 					s.h = (old - size);
-					// printf ("\tremaining %d rows\n", s.h);
 					s.y += size;
 				} else {
 					int old = s.w;
 					int size = (total - max + b->min_size);
 					s.w = size;
-					// printf ("\tallowing %d columns\n", s.w);
 					panel_set_size (b->children[i], &s);
 					s.w = (old - size);
-					// printf ("\tremaining %d columns\n", s.w);
 					s.x += size;
 				}
 			} else {
 				panel_set_size (b->children[i], &s);
 			}
 		}
-
-		if (filler >= 0) {
-			// printf ("ADJUST\n");
-		}
 	} else if (b->orient == O_VERTICAL) {
-		// printf ("\t%s VERTICAL min %d, max %d\n", b->name, b->min_size, b->max_size);
 		if (b->min_size > r->w) {
 			b->computed.x = -1;	// Too little width
 			b->computed.y = -1;
@@ -248,7 +233,6 @@ panel_set_size (Panel *b, Rect *r)
 			r->w  = 0;
 		}
 	} else {
-		// printf ("\t%s HORIZONTAL min %d, max %d\n", b->name, b->min_size, b->max_size);
 		if (b->min_size > r->h) {
 			b->computed.x = -1;	// Too little height
 			b->computed.y = -1;
@@ -289,8 +273,6 @@ panel_set_size (Panel *b, Rect *r)
 	if (flags != 0) {
 		b->notify (b, flags);
 	}
-
-	// printf ("\t%s CHOSEN %d,%d %dx%d\n", b->name, b->computed.x, b->computed.y, b->computed.w, b->computed.h);
 }
 
 void
@@ -354,8 +336,6 @@ panel_new (const char *name, Panel *parent, Orientation orient, int visible, int
 	b->old_computed.y = -1;
 	b->old_computed.w = -1;
 	b->old_computed.h = -1;
-
-	b->redraws = 0;
 
 	if (parent) {
 		panel_add_child (parent, b);
