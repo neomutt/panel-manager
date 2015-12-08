@@ -29,14 +29,17 @@ init_colours (void)
 
 
 WINDOW *
-gfx_create_newwin (int height, int width, int y, int x, int colour)
+gfx_create_newwin (Rect *r, int colour)
 {
+	if (!r)
+		return NULL;
+
 	WINDOW *w;
 
-	w = newwin (height, width, y, x);
+	w = newwin (r->h, r->w, r->y, r->x);
 	wcolor_set (w, colour, NULL);
 	box (w, 0 , 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
-	wrefresh (w);		/* Show that panel */
+	wrefresh (w);
 
 	return w;
 }
