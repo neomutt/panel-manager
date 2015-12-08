@@ -26,12 +26,14 @@ typedef struct _panel {
 	int redraws;
 } Panel;
 
-BOOL delete_panel (Panel *b);
-BOOL insert_panel (Panel *parent, Panel *b, int index);
-void dump_panels (Panel *b, int indent);
-void set_size (Panel *b, Rect *r);
-void free_panel (Panel *b);
-void add_child (Panel *parent, Panel *b);
-Panel * new_panel (const char *name, Panel *parent, Orientation orient, int visible, int min, int max);
+Panel * panel_new       (const char *name, Panel *parent, Orientation orient, int visible, int min, int max);
+void    panel_free      (Panel *b);
+
+void    panel_add_child (Panel *parent, Panel *b);
+BOOL    panel_insert    (Panel *parent, Panel *b, int index);
+BOOL    panel_delete    (Panel *b);
+void    panel_set_size  (Panel *b, Rect *r);
+
+void    panel_dump      (Panel *b, int indent);
 
 #endif /* _PANEL_H_ */

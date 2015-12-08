@@ -4,7 +4,7 @@
 #include "panel.h"
 #include "log.h"
 
-void
+static void
 cb_notify (Panel *b, Notification flags)
 {
 	if (!b || (flags == 0))
@@ -25,8 +25,7 @@ cb_notify (Panel *b, Notification flags)
 		(flags & N_DELETED)         ? d : "");
 }
 
-
-void
+static void
 notify_delete (Panel *b)
 {
 	if (!b)
@@ -44,8 +43,9 @@ notify_delete (Panel *b)
 	b->old_computed = dead;
 }
 
+
 BOOL
-delete_panel (Panel *b)
+panel_delete (Panel *b)
 {
 	if (!b)
 		return FALSE;
@@ -80,7 +80,7 @@ delete_panel (Panel *b)
 }
 
 BOOL
-insert_panel (Panel *parent, Panel *b, int index)
+panel_insert (Panel *parent, Panel *b, int index)
 {
 	if (!parent || !b)
 		return FALSE;
@@ -102,7 +102,7 @@ insert_panel (Panel *parent, Panel *b, int index)
 }
 
 void
-dump_panels (Panel *b, int indent)
+panel_dump (Panel *b, int indent)
 {
 	if (!b)
 		return;
@@ -129,12 +129,12 @@ dump_panels (Panel *b, int indent)
 
 	int i;
 	for (i = 0; i < b->count; i++) {
-		dump_panels (b->children[i], indent + 1);
+		panel_dump (b->children[i], indent + 1);
 	}
 }
 
 void
-set_size (Panel *b, Rect *r)
+panel_set_size (Panel *b, Rect *r)
 {
 	if (!b || !r)
 		return;
@@ -196,7 +196,7 @@ set_size (Panel *b, Rect *r)
 					int size = (total - max + b->min_size);
 					s.h = size;
 					// printf ("\tallowing %d rows\n", s.h);
-					set_size (b->children[i], &s);
+					panel_set_size (b->children[i], &s);
 					s.h = (old - size);
 					// printf ("\tremaining %d rows\n", s.h);
 					s.y += size;
@@ -205,13 +205,13 @@ set_size (Panel *b, Rect *r)
 					int size = (total - max + b->min_size);
 					s.w = size;
 					// printf ("\tallowing %d columns\n", s.w);
-					set_size (b->children[i], &s);
+					panel_set_size (b->children[i], &s);
 					s.w = (old - size);
 					// printf ("\tremaining %d columns\n", s.w);
 					s.x += size;
 				}
 			} else {
-				set_size (b->children[i], &s);
+				panel_set_size (b->children[i], &s);
 			}
 		}
 
@@ -292,7 +292,7 @@ set_size (Panel *b, Rect *r)
 }
 
 void
-free_panel (Panel *b)
+panel_free (Panel *b)
 {
 	if (!b)
 		return;
@@ -300,7 +300,7 @@ free_panel (Panel *b)
 	if ((b->count > 0) && b->children) {
 		int i;
 		for (i = 0; i < b->count; i++) {
-			free_panel (b->children[i]);
+			panel_free (b->children[i]);
 		}
 	}
 
@@ -309,7 +309,7 @@ free_panel (Panel *b)
 }
 
 void
-add_child (Panel *parent, Panel *b)
+panel_add_child (Panel *parent, Panel *b)
 {
 	if (!parent || !b)
 		return;
@@ -324,7 +324,7 @@ add_child (Panel *parent, Panel *b)
 }
 
 Panel *
-new_panel (const char *name, Panel *parent, Orientation orient, int visible, int min, int max)
+panel_new (const char *name, Panel *parent, Orientation orient, int visible, int min, int max)
 {
 	Panel *b = malloc (sizeof (Panel));
 	if (!b)
@@ -356,7 +356,7 @@ new_panel (const char *name, Panel *parent, Orientation orient, int visible, int
 	b->redraws = 0;
 
 	if (parent) {
-		add_child (parent, b);
+		panel_add_child (parent, b);
 	}
 
 	return b;

@@ -20,6 +20,7 @@ int_catcher (int sig)
 	// old_int (sig);
 }
 
+
 void
 signal_init_handlers (void)
 {

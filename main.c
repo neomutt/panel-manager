@@ -10,18 +10,18 @@
 static Panel *
 create_panels (void)
 {
-	Panel *top      =       new_panel ("top",      NULL,   O_VERTICAL,   FALSE,  1,  -1);
+	Panel *top      =       panel_new ("top",      NULL,   O_VERTICAL,   FALSE,  1,  -1);
 
-				new_panel ("helpline", top,    O_HORIZONTAL, TRUE,   1,   1);
-	Panel *middle   =       new_panel ("middle",   top,    O_HORIZONTAL, FALSE,  1,  -1);
-				new_panel ("status",   top,    O_HORIZONTAL, TRUE,   1,   1);
+				panel_new ("helpline", top,    O_HORIZONTAL, TRUE,   1,   1);
+	Panel *middle   =       panel_new ("middle",   top,    O_HORIZONTAL, FALSE,  1,  -1);
+				panel_new ("status",   top,    O_HORIZONTAL, TRUE,   1,   1);
 
-				new_panel ("sidebar",  middle, O_VERTICAL,   TRUE,  20,  20);
-	Panel *right    =       new_panel ("right",    middle, O_VERTICAL,   FALSE,  1,  -1);
+				panel_new ("sidebar",  middle, O_VERTICAL,   TRUE,  20,  20);
+	Panel *right    =       panel_new ("right",    middle, O_VERTICAL,   FALSE,  1,  -1);
 
-				new_panel ("index",    right,  O_HORIZONTAL, TRUE,  10,  10);
-				new_panel ("pager",    right,  O_HORIZONTAL, TRUE,   1,  -1);
-				// new_panel ("helppage", right,  O_HORIZONTAL, FALSE,  1,  -1);
+				panel_new ("index",    right,  O_HORIZONTAL, TRUE,  10,  10);
+				panel_new ("pager",    right,  O_HORIZONTAL, TRUE,   1,  -1);
+				// panel_new ("helppage", right,  O_HORIZONTAL, FALSE,  1,  -1);
 	return top;
 }
 
@@ -81,7 +81,7 @@ main (int argc, char *argv[])
 
 			repaints++;
 
-			set_size (top, &r);
+			panel_set_size (top, &r);
 
 			win1 = gfx_create_window (&hl->computed, 1);
 			win2 = gfx_create_window (&sb->computed, 2);

@@ -66,7 +66,7 @@ $(DEPDIR) $(OBJDIR):
 tags:	$(SRC) $(HDR)
 	$(QUIET_TAGS)ctags -R .
 
-clean c:
+clean:
 	$(Q)$(RM) $(OUT) $(OBJ)
 
 distclean: clean
