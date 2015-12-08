@@ -25,6 +25,32 @@ create_panels (void)
 	return top;
 }
 
+static void
+wipe_window (WINDOW *win)
+{
+	if (!win)
+		return;
+
+	gfx_wipe_window  (win);
+	gfx_close_window (win);
+}
+
+static void
+draw_window (WINDOW **win, Panel *pan, int colour)
+{
+	if (!win || !pan)
+		return;
+
+	if (pan->visible) {
+		log_message ("%s visible\n", pan->name);
+		*win = gfx_create_window (&(pan->computed), colour);
+		gfx_print (*win, pan->name, pan->redraws);
+	} else {
+		log_message ("%s hidden\n", pan->name);
+		*win = NULL;
+	}
+}
+
 
 int
 main (int argc, char *argv[])
@@ -75,37 +101,19 @@ main (int argc, char *argv[])
 
 			panel_set_size (top, &r);
 
-			gfx_wipe_window (win1); gfx_close_window (win1); win1 = NULL;
-			gfx_wipe_window (win2); gfx_close_window (win2); win2 = NULL;
-			gfx_wipe_window (win3); gfx_close_window (win3); win3 = NULL;
-			gfx_wipe_window (win4); gfx_close_window (win4); win4 = NULL;
-			gfx_wipe_window (win5); gfx_close_window (win5); win5 = NULL;
-			gfx_wipe_window (win6); gfx_close_window (win6); win6 = NULL;
+			wipe_window (win1);
+			wipe_window (win2);
+			wipe_window (win3);
+			wipe_window (win4);
+			wipe_window (win5);
+			wipe_window (win6);
 
-			if (hl->visible) {
-				win1 = gfx_create_window (&hl->computed, 1);
-				gfx_print (win1, hl->name, hl->redraws);
-			}
-			if (sb->visible) {
-				win2 = gfx_create_window (&sb->computed, 2);
-				gfx_print (win2, sb->name, sb->redraws);
-			}
-			if (in->visible) {
-				win3 = gfx_create_window (&in->computed, 3);
-				gfx_print (win3, in->name, in->redraws);
-			}
-			if (pg->visible) {
-				win4 = gfx_create_window (&pg->computed, 4);
-				gfx_print (win4, pg->name, pg->redraws);
-			}
-			if (st->visible) {
-				win5 = gfx_create_window (&st->computed, 5);
-				gfx_print (win5, st->name, st->redraws);
-			}
-			if (hp->visible) {
-				win6 = gfx_create_window (&hp->computed, 6);
-				gfx_print (win6, hp->name, hp->redraws);
-			}
+			draw_window (&win1, hl, 1);
+			draw_window (&win2, sb, 2);
+			draw_window (&win3, in, 3);
+			draw_window (&win4, pg, 4);
+			draw_window (&win5, st, 5);
+			draw_window (&win6, hp, 6);
 		}
 
 		// This will block until a key is pressed, or a signal is received.
@@ -135,7 +143,15 @@ main (int argc, char *argv[])
 		}
 	}
 
+	panel_free (top);
+	gfx_close_window (win1);
+	gfx_close_window (win2);
+	gfx_close_window (win3);
+	gfx_close_window (win4);
+	gfx_close_window (win5);
+	gfx_close_window (win6);
 	gfx_shutdown();
+	log_close();
 	return 0;
 }
 
