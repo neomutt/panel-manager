@@ -1,12 +1,15 @@
 #include <signal.h>
 #include <stddef.h>
 
+#include "log.h"
+
 void (*old_winch) (int) = NULL;
 
 void
 catcher (int sig)
 {
 	old_winch (sig);
+	log_message ("caught SIGWINCH\n");
 }
 
 void

@@ -3,16 +3,6 @@
 #include "bool.h"
 #include "rect.h"
 
-Rect
-gfx_get_rect (WINDOW *win)
-{
-	if (win) {
-	}
-
-	Rect r = { 0, 0, COLS, LINES };
-	return r;
-}
-
 static void
 init_colours (void)
 {
@@ -28,8 +18,19 @@ init_colours (void)
 }
 
 
+Rect
+gfx_get_rect (WINDOW *win)
+{
+	if (win) {
+	}
+
+	// noecho();	// fake call to ensure curses is up-to-date
+	Rect r = { 0, 0, COLS, LINES };
+	return r;
+}
+
 WINDOW *
-gfx_create_newwin (Rect *r, int colour)
+gfx_create_window (Rect *r, int colour)
 {
 	if (!r)
 		return NULL;
@@ -38,7 +39,7 @@ gfx_create_newwin (Rect *r, int colour)
 
 	w = newwin (r->h, r->w, r->y, r->x);
 	wcolor_set (w, colour, NULL);
-	box (w, 0 , 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
+	box (w, 0, 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
 	wrefresh (w);
 
 	return w;
@@ -47,9 +48,13 @@ gfx_create_newwin (Rect *r, int colour)
 void
 gfx_init (void)
 {
-	// WINDOW *main_win = 
+	WINDOW *main_win =
 	initscr ();
 	init_colours ();
+	cbreak();
+	noecho();
+	nodelay (main_win, TRUE);
+	// halfdelay (1);
 }
 
 void
@@ -78,9 +83,18 @@ gfx_close_window (WINDOW *win)
 }
 
 void
-gfx_print (WINDOW *win, const char *msg)
+gfx_print (WINDOW *win, const char *msg, int redraw)
 {
-	wprintw (win, msg);
+	wprintw (win, "%s: %d", msg, redraw);
 	wrefresh (win);
+}
+
+int
+gfx_get_char (WINDOW *win)
+{
+	if (win)
+		return wgetch (win);
+	else
+		return getch();
 }
 

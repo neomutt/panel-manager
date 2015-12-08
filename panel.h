@@ -23,6 +23,7 @@ typedef struct _panel {
 	BOOL old_visible;
 	Rect old_computed;
 	cb_notify_t notify;
+	int redraws;
 } Panel;
 
 BOOL delete_panel (Panel *b);

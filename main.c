@@ -52,38 +52,99 @@ main (int argc, char *argv[])
 	Panel *pg = top->children[1]->children[1]->children[1];
 	Panel *st = top->children[2];
 
-	while (1) {
+	BOOL finished = FALSE;
+	int r_count = 0;
+	BOOL repaint = FALSE;
+	Rect old = { -1, -1, -1, -1 };
+
+	WINDOW *win1 = NULL;
+	WINDOW *win2 = NULL;
+	WINDOW *win3 = NULL;
+	WINDOW *win4 = NULL;
+	WINDOW *win5 = NULL;
+
+	while (!finished) {
 		Rect r = gfx_get_rect (NULL);
+		log_message ("Rect: %d,%d %dx%d\n", r.x, r.y, r.w, r.h);
 
-		set_size (top, &r);
+		if (rect_sizes_differ (&old, &r)) {
+			log_message ("Rects changed\n");
+			old = r;
+			repaint = TRUE;
+		}
 
-		WINDOW *win1, *win2, *win3, *win4, *win5;
+		if (repaint) {
+			log_message ("wipe start\n");
+			gfx_wipe_window (win1);
+			gfx_wipe_window (win2);
+			gfx_wipe_window (win3);
+			gfx_wipe_window (win4);
+			gfx_wipe_window (win5);
 
-		win1 = gfx_create_newwin (&hl->computed, 1);
-		win2 = gfx_create_newwin (&sb->computed, 2);
-		win3 = gfx_create_newwin (&in->computed, 3);
-		win4 = gfx_create_newwin (&pg->computed, 4);
-		win5 = gfx_create_newwin (&st->computed, 5);
+			gfx_close_window (win1);
+			gfx_close_window (win2);
+			gfx_close_window (win3);
+			gfx_close_window (win4);
+			gfx_close_window (win5);
+			log_message ("wipe end\n");
 
-		gfx_print (win1, hl->name);
-		gfx_print (win2, sb->name);
-		gfx_print (win3, in->name);
-		gfx_print (win4, pg->name);
-		gfx_print (win5, st->name);
+			r_count++;
+			log_message ("Repaints = %d\n", r_count);
 
-		sleep (999);	// Wait until we receive a signal, e.g. SIGWINCH
+			set_size (top, &r);
 
-		gfx_wipe_window (win1);
-		gfx_wipe_window (win2);
-		gfx_wipe_window (win3);
-		gfx_wipe_window (win4);
-		gfx_wipe_window (win5);
+			log_message ("create start\n");
+			win1 = gfx_create_window (&hl->computed, 1);
+			win2 = gfx_create_window (&sb->computed, 2);
+			win3 = gfx_create_window (&in->computed, 3);
+			win4 = gfx_create_window (&pg->computed, 4);
+			win5 = gfx_create_window (&st->computed, 5);
+			log_message ("create end\n");
 
-		gfx_close_window (win1);
-		gfx_close_window (win2);
-		gfx_close_window (win3);
-		gfx_close_window (win4);
-		gfx_close_window (win5);
+			log_message ("print start\n");
+			gfx_print (win1, hl->name, hl->redraws);
+			gfx_print (win2, sb->name, sb->redraws);
+			gfx_print (win3, in->name, r_count);
+			gfx_print (win4, pg->name, pg->redraws);
+			gfx_print (win5, st->name, st->redraws);
+			log_message ("print end\n");
+
+			repaint = FALSE;
+		}
+
+		int ch = gfx_get_char (win5);
+		if (ch == 'q')
+			break;
+
+		if (usleep (100000) != 0) {
+			repaint = TRUE;
+		}
+#if 0
+		while (1) {
+			log_message (".");
+			int ch = gfx_get_char();
+			if (ch == 'q') {
+				log_message ("q pressed\n");
+				finished = TRUE;
+				break;
+			} else if (ch == 'r') {
+				log_message ("r pressed\n");
+				break;
+			} else if (ch == -1) {
+				// sleep (1);
+				// break;
+			}
+			// usleep (100000);
+
+			if (usleep (100000) != 0) {
+				log_message ("usleep interrupted\n");
+				break;
+			}
+		}
+
+		log_message ("\n");
+#endif
+
 	}
 
 	gfx_shutdown();

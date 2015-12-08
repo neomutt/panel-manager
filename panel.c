@@ -6,6 +6,11 @@
 void
 cb_notify (Panel *b, Notification flags)
 {
+	if (!b || (flags == 0))
+		return;
+
+	b->redraws++;
+#if 0
 	char *s = "SIZE ";
 	char *p = "POSN ";
 	char *v = "VISIBLE ";
@@ -17,7 +22,9 @@ cb_notify (Panel *b, Notification flags)
 		(flags & N_POSN_CHANGED)    ? p : "",
 		(flags & N_VISIBLE_CHANGED) ? v : "",
 		(flags & N_DELETED)         ? d : "");
+#endif
 }
+
 
 void
 notify_delete (Panel *b)
@@ -345,6 +352,8 @@ new_panel (const char *name, Panel *parent, Orientation orient, int visible, int
 	b->old_computed.y = -1;
 	b->old_computed.w = -1;
 	b->old_computed.h = -1;
+
+	b->redraws = 0;
 
 	if (parent) {
 		add_child (parent, b);
