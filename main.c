@@ -6,6 +6,7 @@
 #include "rect.h"
 #include "gfx.h"
 #include "signal.h"
+#include "log.h"
 
 static Panel *
 create_panels (void)
@@ -26,8 +27,19 @@ create_panels (void)
 }
 
 int
-main ()
+main (int argc, char *argv[])
 {
+	const char *log_file = "/home/mutt/log.txt";
+
+	if (argc > 1) {
+		log_file = argv[1];
+	}
+
+	if (!log_open (log_file)) {
+		printf ("Can't open log file: '%s'\n", argv[1]);
+		return 1;
+	}
+
 	gfx_init();
 
 	signal_init_handlers();
