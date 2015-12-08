@@ -1,8 +1,6 @@
 #ifndef _NOTIFY_H_
 #define _NOTIFY_H_
 
-#include "bool.h"
-
 typedef enum {
 	N_SIZE_CHANGED     = (1<<0),
 	N_POSN_CHANGED     = (1<<1),
@@ -11,9 +9,8 @@ typedef enum {
 	N_DELETED          = (1<<4),
 } Notification;
 
-typedef struct _box Box;
-typedef struct _rect Rect;
+typedef struct _panel Panel;
 
-typedef void (*cb_notify_t) (Box*, Notification);
+typedef void (*cb_notify_t) (Panel*, Notification);
 
 #endif /* _NOTIFY_H_ */
