@@ -42,7 +42,6 @@ main ()
 	Panel *sb = top->children[1]->children[0];
 	Panel *in = top->children[1]->children[1];
 	Panel *pg = top->children[1]->children[1]->children[0];
-	Panel *hp = top->children[1]->children[1]->children[1];
 	Panel *st = top->children[2];
 
 	while (1) {
@@ -50,28 +49,25 @@ main ()
 
 		set_size (top, &r);
 
-		WINDOW *win1, *win2, *win3, *win4, *win5, *win6;
+		WINDOW *win1, *win2, *win3, *win4, *win5;
 
 		Rect rhl = hl->computed;
 		Rect rsb = sb->computed;
 		Rect rin = in->computed;
 		Rect rpg = pg->computed;
-		Rect rhp = hp->computed;
 		Rect rst = st->computed;
 
 		win1 = gfx_create_newwin (rhl.h, rhl.w, rhl.y, rhl.x, 1);
 		win2 = gfx_create_newwin (rsb.h, rsb.w, rsb.y, rsb.x, 2);
 		win3 = gfx_create_newwin (rin.h, rin.w, rin.y, rin.x, 3);
 		win4 = gfx_create_newwin (rpg.h, rpg.w, rpg.y, rpg.x, 4);
-		win5 = gfx_create_newwin (rhp.h, rhp.w, rhp.y, rhp.x, 5);
-		win6 = gfx_create_newwin (rst.h, rst.w, rst.y, rst.x, 6);
+		win5 = gfx_create_newwin (rst.h, rst.w, rst.y, rst.x, 5);
 
-		gfx_print (win1, "win1");
-		gfx_print (win2, "win2");
-		gfx_print (win3, "win3");
-		gfx_print (win4, "win4");
-		gfx_print (win5, "win5");
-		gfx_print (win6, "win6");
+		gfx_print (win1, "helpline");
+		gfx_print (win2, "sidebar");
+		gfx_print (win3, "index");
+		gfx_print (win4, "pager");
+		gfx_print (win5, "status");
 
 		sleep (999);
 
@@ -80,14 +76,12 @@ main ()
 		gfx_wipe_window (win3);
 		gfx_wipe_window (win4);
 		gfx_wipe_window (win5);
-		gfx_wipe_window (win6);
 
 		gfx_close_window (win1);
 		gfx_close_window (win2);
 		gfx_close_window (win3);
 		gfx_close_window (win4);
 		gfx_close_window (win5);
-		gfx_close_window (win6);
 	}
 
 	gfx_shutdown();
