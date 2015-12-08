@@ -51,6 +51,38 @@ draw_window (WINDOW **win, Panel *pan, int colour)
 	}
 }
 
+static void
+exchange_sidebar (Panel *pan)
+{
+	if (!pan)
+		return;
+
+	Panel *parent = pan->parent;
+	if (!parent)
+		return;
+
+	int index = -1;
+	int i;
+	for (i = 0; i < parent->count; i++) {
+		if (parent->children[i] == pan) {
+			index = i;
+			break;
+		}
+	}
+
+	log_message ("found sidebar %d\n", index);
+
+	if (index < 0)
+		return;
+
+	panel_delete (pan);
+	if (index == 0) {
+		panel_insert (parent, pan, parent->count);
+	} else {
+		panel_insert (parent, pan, 0);
+	}
+}
+
 
 int
 main (int argc, char *argv[])
@@ -72,12 +104,12 @@ main (int argc, char *argv[])
 
 	Panel *top = create_panels();
 
-	Panel *hl = top->children[0];
-	Panel *sb = top->children[1]->children[0];
-	Panel *in = top->children[1]->children[1]->children[0];
-	Panel *pg = top->children[1]->children[1]->children[1];
-	Panel *hp = top->children[1]->children[1]->children[2];
-	Panel *st = top->children[2];
+	Panel *hl = panel_get_by_name (top, "helpline");
+	Panel *sb = panel_get_by_name (top, "sidebar");
+	Panel *in = panel_get_by_name (top, "index");
+	Panel *pg = panel_get_by_name (top, "pager");
+	Panel *hp = panel_get_by_name (top, "helppage");
+	Panel *st = panel_get_by_name (top, "status");
 
 	BOOL finished = FALSE;
 	BOOL force_repaint = FALSE;
@@ -120,7 +152,7 @@ main (int argc, char *argv[])
 		int ch = gfx_get_char (win5);
 		if ((ch == 'q') || (ch < 0)) {
 			break;
-		} else if (ch == 'b') {
+		} else if (ch == 's') {
 			sb->visible = !sb->visible;
 			force_repaint = TRUE;
 		} else if (ch == 'i') {
@@ -128,6 +160,9 @@ main (int argc, char *argv[])
 			force_repaint = TRUE;
 		} else if (ch == 'p') {
 			pg->visible = !pg->visible;
+			force_repaint = TRUE;
+		} else if (ch == 'x') {
+			exchange_sidebar (sb);
 			force_repaint = TRUE;
 		} else if (ch == 'h') {
 			if (hp->visible) {

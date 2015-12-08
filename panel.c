@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "panel.h"
 #include "log.h"
@@ -97,6 +98,7 @@ panel_insert (Panel *parent, Panel *b, int index)
 	}
 
 	parent->children[index] = b;
+	b->parent = parent;
 
 	return TRUE;
 }
@@ -360,5 +362,26 @@ panel_new (const char *name, Panel *parent, Orientation orient, int visible, int
 	}
 
 	return b;
+}
+
+Panel *
+panel_get_by_name (Panel *top, const char *name)
+{
+	if (!top || !name)
+		return NULL;
+
+	if (strcmp (name, top->name) == 0)
+		return top;
+
+	Panel *match = NULL;
+	int i;
+	for (i = 0; i < top->count; i++) {
+		match = panel_get_by_name (top->children[i], name);
+		if (match) {
+			break;
+		}
+	}
+
+	return match;
 }
 

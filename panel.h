@@ -26,8 +26,9 @@ typedef struct _panel {
 	int redraws;
 } Panel;
 
-Panel * panel_new       (const char *name, Panel *parent, Orientation orient, int visible, int min, int max);
-void    panel_free      (Panel *b);
+Panel * panel_new         (const char *name, Panel *parent, Orientation orient, int visible, int min, int max);
+void    panel_free        (Panel *b);
+Panel * panel_get_by_name (Panel *top, const char *name);
 
 void    panel_add_child (Panel *parent, Panel *b);
 BOOL    panel_insert    (Panel *parent, Panel *b, int index);
