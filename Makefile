@@ -78,5 +78,5 @@ force:
 
 -include $(SRC:%.c=$(DEPDIR)/%.d)
 
-.PHONY:	xxx
+.PHONY:
 
