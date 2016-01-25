@@ -1,3 +1,6 @@
+/* Copyright (c) 2015 Richard Russon <rich@flatcap.org>
+ * Released under the GPLv3 -- see LICENSE.md for details */
+
 #include <stdio.h>
 #include <stdarg.h>
 

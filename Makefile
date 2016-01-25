@@ -1,3 +1,6 @@
+# Copyright (c) 2015 Richard Russon <rich@flatcap.org>
+# Released under the GPLv3 -- see LICENSE.md for details
+
 V	?= 0
 CC	?= gcc
 RM	= rm -fr

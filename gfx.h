@@ -1,3 +1,6 @@
+/* Copyright (c) 2015 Richard Russon <rich@flatcap.org>
+ * Released under the GPLv3 -- see LICENSE.md for details */
+
 #ifndef _GFX_H_
 #define _GFX_H_
 
