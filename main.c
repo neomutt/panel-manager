@@ -10,24 +10,10 @@
 #include "signal.h"
 #include "log.h"
 
-static Panel *
-create_panels (void)
-{
-	Panel *top      =       panel_new ("top",      NULL,   O_VERTICAL,   FALSE,  1,  -1);
+#include "contact.h"
+#include "mail.h"
 
-				panel_new ("helpline", top,    O_HORIZONTAL, TRUE,   1,   1);
-	Panel *middle   =       panel_new ("middle",   top,    O_HORIZONTAL, FALSE,  1,  -1);
-				panel_new ("status",   top,    O_HORIZONTAL, TRUE,   1,   1);
-
-				panel_new ("sidebar",  middle, O_VERTICAL,   TRUE,  20,  20);
-	Panel *right    =       panel_new ("right",    middle, O_VERTICAL,   FALSE,  1,  -1);
-
-				panel_new ("index",    right,  O_HORIZONTAL, TRUE,  10,  10);
-				panel_new ("pager",    right,  O_HORIZONTAL, TRUE,   1,  -1);
-				panel_new ("helppage", right,  O_HORIZONTAL, FALSE,  1,  -1);
-	return top;
-}
-
+#if 0
 static void
 wipe_window (WINDOW *win)
 {
@@ -84,10 +70,12 @@ exchange_sidebar (Panel *pan)
 	}
 }
 
+#endif
 
 int
 main (int argc, char *argv[])
 {
+	// sleep (3);
 	const char *log_file = "log.txt";
 
 	if (argc > 1) {
@@ -103,89 +91,47 @@ main (int argc, char *argv[])
 
 	signal_init_handlers();
 
-	Panel *top = create_panels();
+	Panel *global = panel_new ("global", NULL, O_HORIZONTAL, TRUE, -1, -1);
+	if (!global)
+		return 1;
 
-	Panel *hl = panel_get_by_name (top, "helpline");
-	Panel *sb = panel_get_by_name (top, "sidebar");
-	Panel *in = panel_get_by_name (top, "index");
-	Panel *pg = panel_get_by_name (top, "pager");
-	Panel *hp = panel_get_by_name (top, "helppage");
-	Panel *st = panel_get_by_name (top, "status");
+	Panel *help = panel_new ("help", global, O_VERTICAL, FALSE, -1, -1);
+	if (!help)
+		return 1;
 
-	BOOL finished = FALSE;
-	BOOL force_repaint = FALSE;
-	int repaints = 0;
+	if (!mail_init (global))
+		return 1;
+
+	if (!contact_init (global))
+		return 1;
+
 	Rect old = { -1, -1, -1, -1 };
 
-	WINDOW *win1 = NULL;
-	WINDOW *win2 = NULL;
-	WINDOW *win3 = NULL;
-	WINDOW *win4 = NULL;
-	WINDOW *win5 = NULL;
-	WINDOW *win6 = NULL;
-
-	while (!finished) {
+	while (TRUE) {
 		Rect r = gfx_get_rect (NULL);
 
-		if (force_repaint || rect_sizes_differ (&old, &r)) {
-			force_repaint = FALSE;
-			repaints++;
+		if (rect_sizes_differ (&old, &r)) {
 			old = r;
-
-			panel_set_size (top, &r);
-
-			wipe_window (win1);
-			wipe_window (win2);
-			wipe_window (win3);
-			wipe_window (win4);
-			wipe_window (win5);
-			wipe_window (win6);
-
-			draw_window (&win1, hl, 1);
-			draw_window (&win2, sb, 2);
-			draw_window (&win3, in, 3);
-			draw_window (&win4, pg, 4);
-			draw_window (&win5, st, 5);
-			draw_window (&win6, hp, 6);
+			panel_reflow (global, &r, TRUE);
+			panel_dump (global, 0);
 		}
 
+		break;
+
 		// This will block until a key is pressed, or a signal is received.
-		int ch = gfx_get_char (win5);
+		Panel *m = panel_get_by_name (global, "mail");
+		int ch = gfx_get_char (m->window);
+		// log_message ("Key press: %c (%d)\n", ch, ch);
 		if ((ch == 'q') || (ch < 0)) {
 			break;
-		} else if (ch == 's') {
-			sb->visible = !sb->visible;
-			force_repaint = TRUE;
-		} else if (ch == 'i') {
-			in->visible = !in->visible;
-			force_repaint = TRUE;
-		} else if (ch == 'p') {
-			pg->visible = !pg->visible;
-			force_repaint = TRUE;
-		} else if (ch == 'x') {
-			exchange_sidebar (sb);
-			force_repaint = TRUE;
-		} else if (ch == 'h') {
-			if (hp->visible) {
-				pg->visible = TRUE;
-				in->visible = TRUE;
-				hp->visible = FALSE;
-			} else {
-				pg->visible = FALSE;
-				in->visible = FALSE;
-				hp->visible = TRUE;
+		} else if (ch == 12) {
+			if (global->notify) {
+				global->notify (global, N_REPAINT);
 			}
-			force_repaint = TRUE;
 		}
 	}
 
-	panel_free (top);
-	gfx_close_window (win1);
-	gfx_close_window (win2);
-	gfx_close_window (win3);
-	gfx_close_window (win4);
-	gfx_close_window (win5);
-	gfx_close_window (win6);
+	panel_free (global);
 	gfx_shutdown();
 	log_close();
 	return 0;

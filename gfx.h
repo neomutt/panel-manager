@@ -17,6 +17,7 @@ WINDOW * gfx_create_window (Rect *r, int colour);
 void     gfx_wipe_window   (WINDOW *win);
 void     gfx_close_window  (WINDOW *win);
 void     gfx_print         (WINDOW *win, const char *msg);
+void     gfx_print_at      (WINDOW *win, int x, int y, const char *msg);
 int      gfx_get_char      (WINDOW *win);
 
 #endif /* _GFX_H_ */

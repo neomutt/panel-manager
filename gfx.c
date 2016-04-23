@@ -5,6 +5,7 @@
 
 #include "bool.h"
 #include "rect.h"
+#include "log.h"
 
 static void
 init_colours (void)
@@ -45,6 +46,7 @@ gfx_create_window (Rect *r, int colour)
 	box (w, 0, 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
 	wrefresh (w);
 
+	log_message ("Create win: %d+%d %dx%d (%p)\n", r->x, r->y, r->w, r->h, w);
 	return w;
 }
 
@@ -89,6 +91,14 @@ gfx_print (WINDOW *win, const char *msg)
 	wprintw (win, "%s", msg);
 	wrefresh (win);
 }
+
+void
+gfx_print_at (WINDOW *win, int x, int y, const char *msg)
+{
+	mvwprintw (win, y, x, "%s", msg);
+	wrefresh (win);
+}
+
 
 int
 gfx_get_char (WINDOW *win)

@@ -7,9 +7,11 @@
 typedef enum {
 	N_SIZE_CHANGED     = (1<<0),
 	N_POSN_CHANGED     = (1<<1),
-	N_VISIBLE_CHANGED  = (1<<2),
-	N_TOO_LITTLE_SPACE = (1<<3),
-	N_DELETED          = (1<<4),
+	N_VISIBLE          = (1<<2),
+	N_HIDDEN           = (1<<3),
+	N_TOO_LITTLE_SPACE = (1<<4),
+	N_DELETED          = (1<<5),
+	N_REPAINT          = (1<<6),
 } Notification;
 
 typedef struct _panel Panel;

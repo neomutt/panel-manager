@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 #include "bool.h"
 
@@ -15,6 +16,11 @@ log_open (const char *filename)
 		return FALSE;
 
 	flog = fopen (filename, "a");
+
+	if (flog && isatty (fileno (flog))) {
+		// Reset tty
+		fprintf (flog, "\033c");
+	}
 
 	return (flog != NULL);
 }
