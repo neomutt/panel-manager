@@ -22,8 +22,10 @@ draw_window (Panel *p, int colour)
 		return;
 
 	log_message ("%s visible\n", p->name);
-	p->window = gfx_create_window (&(p->computed), colour);
-	gfx_print_at (p->window, 1, 0, p->name);
+	if (panel_is_visible (p)) {
+		p->window = gfx_create_window (&(p->computed), colour);
+		gfx_print_at (p->window, 1, 0, p->name);
+	}
 }
 
 static void

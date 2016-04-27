@@ -94,6 +94,11 @@ cb_notify (Panel *panel, Notification flags)
 		(flags & N_REPAINT)      ? r : "");
 
 	if (!panel->parent) {	// Top-level window
+		gfx_clear_screen (panel->window);
+	}
+
+#if 0
+	if (!panel->parent) {	// Top-level window
 		if ((panel->computed.x < 0) || (panel->computed.y < 0) || (panel->computed.w < 0) || (panel->computed.h < 0))
 			return;
 
@@ -110,6 +115,7 @@ cb_notify (Panel *panel, Notification flags)
 		gfx_refresh (panel->window);
 		sleep (2);
 	}
+#endif
 }
 
 
@@ -174,9 +180,15 @@ main (int argc, char *argv[])
 			panel_set_visible (m, !m->visible);
 			panel_reflow (global, &r, TRUE);
 			panel_set_repaint (global);
+			gfx_clear_screen (global->window);
+			panel_send_notification (global, TRUE);
+			gfx_refresh (global->window);
 			panel_dump (global, 0);
 		} else if (ch == 12) {
 			panel_set_repaint (global);
+			gfx_clear_screen (global->window);
+			panel_send_notification (global, TRUE);
+			gfx_refresh (global->window);
 			panel_dump (global, 0);
 		}
 	}

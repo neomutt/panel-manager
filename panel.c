@@ -62,6 +62,8 @@ panel_send_notification (Panel *p, BOOL recurse)
 		}
 	}
 
+	p->nts = 0;
+
 	return TRUE;
 }
 

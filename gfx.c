@@ -72,7 +72,7 @@ gfx_wipe_window (WINDOW *win)
 	if (!win)
 		return;
 
-	wborder (win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+	wborder (win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
 	wrefresh (win);
 }
 
@@ -119,5 +119,13 @@ gfx_get_char (WINDOW *win)
 	} else {
 		return getch();
 	}
+}
+
+
+void
+gfx_clear_screen (WINDOW *win)
+{
+	wclear (win);
+	wrefresh (win);
 }
 
