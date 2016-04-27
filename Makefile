@@ -27,7 +27,7 @@ LDFLAGS	+= -rdynamic
 CFLAGS	+= -fno-omit-frame-pointer
 CFLAGS	+= -fno-optimize-sibling-calls
 
-PACKAGES += ncurses
+PACKAGES += ncursesw
 
 CFLAGS	+= $(shell pkg-config --cflags $(PACKAGES))
 LDFLAGS	+= $(shell pkg-config --libs   $(PACKAGES))

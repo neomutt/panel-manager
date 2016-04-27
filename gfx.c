@@ -43,7 +43,18 @@ gfx_create_window (Rect *r, int colour)
 
 	w = newwin (r->h, r->w, r->y, r->x);
 	wcolor_set (w, colour, NULL);
-	box (w, 0, 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
+	if (r->h > 1) {
+		box (w, 0, 0);		/* 0, 0 gives default characters for the vertical and horizontal lines*/
+	} else {
+		wmove (w, r->y, r->x);
+		wprintw (w, "╞");
+
+		int i;
+		for (i = 1; i < (r->w - 1); i++) {
+			wprintw (w, "═");
+		}
+		wprintw (w, "╡");
+	}
 	wrefresh (w);
 
 	log_message ("Create win: %d+%d %dx%d (%p)\n", r->x, r->y, r->w, r->h, w);

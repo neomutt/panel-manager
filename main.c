@@ -2,6 +2,7 @@
  * Released under the GPLv3 -- see LICENSE.md for details */
 
 #include <stdio.h>
+#include <locale.h>
 
 #include "bool.h"
 #include "panel.h"
@@ -123,6 +124,7 @@ int
 main (int argc, char *argv[])
 {
 	// sleep(3);
+	setlocale (LC_ALL, "");
 	const char *log_file = "log.txt";
 
 	if (argc > 1) {
