@@ -71,10 +71,52 @@ exchange_sidebar (Panel *pan)
 }
 
 #endif
+static void
+cb_notify (Panel *panel, Notification flags)
+{
+	if (!panel || (flags == 0))
+		return;
+
+	char *s = "SIZE ";
+	char *p = "POSN ";
+	char *v = "VISIBLE ";
+	char *h = "HIDDEN ";
+	char *d = "DELETE ";
+	char *r = "REPAINT ";
+
+	log_message ("%s has changed: %s%s%s%s%s%s\n",
+		panel->name,
+		(flags & N_SIZE_CHANGED) ? s : "",
+		(flags & N_POSN_CHANGED) ? p : "",
+		(flags & N_VISIBLE)      ? v : "",
+		(flags & N_HIDDEN)       ? h : "",
+		(flags & N_DELETED)      ? d : "",
+		(flags & N_REPAINT)      ? r : "");
+
+	if (!panel->parent) {	// Top-level window
+		if ((panel->computed.x < 0) || (panel->computed.y < 0) || (panel->computed.w < 0) || (panel->computed.h < 0))
+			return;
+
+		if (!panel->window)
+			return;
+
+		int x, y;
+		for (y = 1; y < (panel->computed.h - 1); y++) {
+			gfx_move (panel->window, 1, y);
+			for (x = 1; x < (panel->computed.w - 1); x++) {
+				gfx_print (panel->window, ".");
+			}
+		}
+		gfx_refresh (panel->window);
+		sleep (2);
+	}
+}
+
 
 int
 main (int argc, char *argv[])
 {
+	// sleep(3);
 	const char *log_file = "log.txt";
 
 	if (argc > 1) {
@@ -93,6 +135,7 @@ main (int argc, char *argv[])
 	Panel *global = panel_new ("global", NULL, O_HORIZONTAL, TRUE, 1, -1);
 	if (!global)
 		return 1;
+	global->notify = cb_notify;
 
 	Panel *help = panel_new ("help", global, O_VERTICAL, FALSE, 1, -1);
 	if (!help)
@@ -111,26 +154,30 @@ main (int argc, char *argv[])
 
 		if (rect_sizes_differ (&old, &r)) {
 			old = r;
+			gfx_wipe_window  (global->window);
+			gfx_close_window (global->window);
+			global->window = gfx_create_window (&r, 1);
 			panel_reflow (global, &r, TRUE);
+			panel_dump (global, 0);
+			panel_send_notification (global, TRUE);
 			panel_dump (global, 0);
 		}
 
-		// break;
-
-		// This will block until a key is pressed, or a signal is received.
 		Panel *m = panel_get_by_name (global, "mail");
-		int ch = gfx_get_char (m->window);
+		Panel *i = panel_get_by_name (global, "index-window");
+		// This will block until a key is pressed, or a signal is received.
+		int ch = gfx_get_char (i->window);
 		// log_message ("Key press: %c (%d)\n", ch, ch);
 		if ((ch == 'q') || (ch < 0)) {
 			break;
 		} else if (ch == 't') {
 			panel_set_visible (m, !m->visible);
 			panel_reflow (global, &r, TRUE);
+			panel_set_repaint (global);
 			panel_dump (global, 0);
 		} else if (ch == 12) {
-			if (global->notify) {
-				global->notify (global, N_REPAINT);
-			}
+			panel_set_repaint (global);
+			panel_dump (global, 0);
 		}
 	}
 

@@ -99,6 +99,17 @@ gfx_print_at (WINDOW *win, int x, int y, const char *msg)
 	wrefresh (win);
 }
 
+void
+gfx_move (WINDOW *win, int x, int y)
+{
+	wmove (win, y, x);
+}
+
+void
+gfx_refresh (WINDOW *win)
+{
+	wrefresh (win);
+}
 
 int
 gfx_get_char (WINDOW *win)

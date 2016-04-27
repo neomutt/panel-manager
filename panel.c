@@ -10,29 +10,6 @@
 #include "notify.h"
 
 static void
-cb_notify (Panel *panel, Notification flags)
-{
-	if (!panel || (flags == 0))
-		return;
-
-	char *s = "SIZE ";
-	char *p = "POSN ";
-	char *v = "VISIBLE ";
-	char *h = "HIDDEN ";
-	char *d = "DELETE ";
-	char *r = "REPAINT ";
-
-	log_message ("%s has changed: %s%s%s%s%s%s\n",
-		panel->name,
-		(flags & N_SIZE_CHANGED) ? s : "",
-		(flags & N_POSN_CHANGED) ? p : "",
-		(flags & N_VISIBLE)      ? v : "",
-		(flags & N_HIDDEN)       ? h : "",
-		(flags & N_DELETED)      ? d : "",
-		(flags & N_REPAINT)      ? r : "");
-}
-
-static void
 notify_delete (Panel *p)
 {
 	if (!p)
@@ -48,31 +25,6 @@ notify_delete (Panel *p)
 }
 
 
-#if 0
-void
-notify_change (Panel *p)
-{
-	if (!p)
-		return;
-
-	Notification flags = 0;
-	if (p->visible != p->old_visible) {
-		flags |= N_VISIBLE;
-	}
-	if (rect_positions_differ (&p->computed, &p->old_computed)) {
-		flags |= N_POSN_CHANGED;
-	}
-	if (rect_sizes_differ (&p->computed, &p->old_computed)) {
-		flags |= N_SIZE_CHANGED;
-	}
-
-	if (flags != 0) {
-		p->notify (p, flags);
-	}
-}
-
-#endif
-
 cb_notify_t
 find_notify_callback (Panel *p)
 {
@@ -86,8 +38,9 @@ find_notify_callback (Panel *p)
 }
 
 BOOL
-send_notification (Panel *p, BOOL recurse)
+panel_send_notification (Panel *p, BOOL recurse)
 {
+	log_message ("sn: %s (%d)\n", p->name, recurse);
 	if (!p)
 		return FALSE;
 
@@ -104,7 +57,7 @@ send_notification (Panel *p, BOOL recurse)
 
 	int i;
 	for (i = 0; i < p->count; i++) {
-		if (!send_notification (p->children[i], recurse)) {
+		if (!panel_send_notification (p->children[i], recurse)) {
 			return FALSE;
 		}
 	}
@@ -112,6 +65,43 @@ send_notification (Panel *p, BOOL recurse)
 	return TRUE;
 }
 
+
+char *
+notify_flags (Panel *p)
+{
+	static char buffer[10];
+
+	memset (buffer, 0, sizeof (buffer));
+	if (p->nts == 0)
+		return buffer;
+
+	sprintf (buffer, "(%s%s%s%s%s%s)",
+		(p->nts & N_SIZE_CHANGED) ? "S" : "",
+		(p->nts & N_POSN_CHANGED) ? "P" : "",
+		(p->nts & N_VISIBLE)      ? "V" : "",
+		(p->nts & N_HIDDEN)       ? "H" : "",
+		(p->nts & N_DELETED)      ? "D" : "",
+		(p->nts & N_REPAINT)      ? "R" : "");
+
+	return buffer;
+}
+
+void
+panel_set_repaint (Panel *p)
+{
+	if (!p)
+		return;
+
+	if (!p->visible)
+		return;
+
+	p->nts |= N_REPAINT;
+
+	int i;
+	for (i = 0; i < p->count; i++) {
+		panel_set_repaint (p->children[i]);
+	}
+}
 
 void
 panel_set_visible2 (Panel *p, BOOL visible)
@@ -225,7 +215,7 @@ panel_dump (Panel *p, int indent)
 
 	int colour = 32;	// Default: green
 
-	if (p->max_size < 0) {
+	if ((p->max_size < 0) && (p->count > 0)) {
 		if (panel_is_visible (p)) {
 			colour = 36;	// Structure: cyan
 		} else {
@@ -244,7 +234,7 @@ panel_dump (Panel *p, int indent)
 		}
 	}
 
-	log_message ("\033[1;%dm%*s%c %s %d,%d %dx%d\033[m\n",
+	log_message ("\033[1;%dm%*s%c %s %d,%d %dx%d\033[m %s\n",
 		colour,
 		indent*4, "",
 		type,
@@ -252,7 +242,8 @@ panel_dump (Panel *p, int indent)
 		p->computed.x,
 		p->computed.y,
 		p->computed.w,
-		p->computed.h);
+		p->computed.h,
+		notify_flags (p));
 
 	int i;
 	for (i = 0; i < p->count; i++) {
@@ -267,7 +258,7 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 		return;
 
 	if (!p->visible) {
-		send_notification (p, TRUE);
+		panel_send_notification (p, TRUE);
 		return;
 	}
 
@@ -316,7 +307,7 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 	}
 
 	if (notify && (p->nts != 0)) {
-		send_notification (p, FALSE);
+		panel_send_notification (p, FALSE);
 	}
 
 	int i;
@@ -358,8 +349,10 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 
 	for (i = 0; i < p->count; i++) {
 		Panel *child = p->children[i];
-		if (!child->visible)
+		if (!child->visible) {
+			panel_send_notification (child, TRUE);
 			continue;
+		}
 
 		int size;
 		space.x = remain.x;
@@ -452,7 +445,7 @@ panel_new (const char *name, Panel *parent, Orientation orient, int visible, int
 	p->min_size = min;
 	p->max_size = max;
 
-	p->notify   = cb_notify;
+	p->notify   = NULL;
 	p->window   = NULL;
 
 	p->computed = R_DEAD;

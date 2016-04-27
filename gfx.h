@@ -19,5 +19,7 @@ void     gfx_close_window  (WINDOW *win);
 void     gfx_print         (WINDOW *win, const char *msg);
 void     gfx_print_at      (WINDOW *win, int x, int y, const char *msg);
 int      gfx_get_char      (WINDOW *win);
+void     gfx_move          (WINDOW *win, int x, int y);
+void     gfx_refresh       (WINDOW *win);
 
 #endif /* _GFX_H_ */

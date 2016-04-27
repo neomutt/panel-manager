@@ -4,7 +4,6 @@
 #include "panel.h"
 #include "log.h"
 
-#if 0
 static void
 wipe_window (Panel *p)
 {
@@ -33,17 +32,19 @@ notify (Panel *p, Notification n)
 	if (!p)
 		return;
 
-	// log_message ("mail notify %d\n", (int) n);
+	log_message ("mail notify %s %d\n", p->name, (int) n);
+
+	// if (p->max_size < 0)
+	// 	return;
 
 	// if (n & (N_SIZE_CHANGED | N_POSN_CHANGED | N_REPAINT)) {
-	// 	wipe_window (p);
-	// 	draw_window (p, 6);
-	// 	Rect *r = &p->computed;
-	// 	log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
+		wipe_window (p);
+		draw_window (p, 6);
+		Rect *r = &p->computed;
+		log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
 	// }
 }
 
-#endif
 static Panel*
 create_panels (Panel *parent)
 {
@@ -66,7 +67,7 @@ create_panels (Panel *parent)
 				// panel_new ("attach-index",  right,  O_HORIZONTAL,     FALSE,   1,  10);
 				// panel_new ("attach-window", right,  O_HORIZONTAL,     FALSE,   1,  -1);
 
-	// mail->notify = notify;
+	mail->notify = notify;
 	return mail;
 }
 

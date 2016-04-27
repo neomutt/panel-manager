@@ -40,7 +40,9 @@ BOOL    panel_insert    (Panel *parent, Panel *p, int index);
 BOOL    panel_delete    (Panel *p);
 void    panel_reflow    (Panel *p, const Rect *r, BOOL notify);
 
-void    panel_set_visible (Panel *p, BOOL visible);
-void    panel_dump        (Panel *p, int indent);
+void    panel_set_visible       (Panel *p, BOOL visible);
+void    panel_dump              (Panel *p, int indent);
+BOOL    panel_send_notification (Panel *p, BOOL recurse);
+void    panel_set_repaint       (Panel *p);
 
 #endif /* _PANEL_H_ */
