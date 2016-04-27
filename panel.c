@@ -9,6 +9,8 @@
 #include "log.h"
 #include "notify.h"
 
+static Rect R_DEAD = { -1, -1, -1, -1 };
+
 static void
 cb_notify (Panel *panel, Notification flags)
 {
@@ -43,9 +45,7 @@ notify_delete (Panel *p)
 		notify_delete (p->children[i]);
 	}
 
-	Rect dead = { -1, -1, -1, -1 };
-
-	p->computed = dead;
+	p->computed = R_DEAD;
 	p->notify (p, N_DELETED);
 }
 
@@ -165,7 +165,7 @@ panel_dump (Panel *p, int indent)
 
 	int colour = 32;	// Default: green
 
-	if (p->max_size == -1) {
+	if (p->max_size < 0) {
 		if (panel_is_visible (p)) {
 			colour = 36;	// Structure: cyan
 		} else {
@@ -224,10 +224,7 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 
 	if (p->orient == O_HORIZONTAL) {
 		if (p->min_size > avail->w) {
-			p->computed.x = -1;             // Too little width
-			p->computed.y = -1;
-			p->computed.w = -1;
-			p->computed.h = -1;
+			p->computed = R_DEAD;            // Too little width
 			p->nts |= N_TOO_LITTLE_SPACE;
 		} else if ((p->max_size >= 0) && (p->max_size < avail->w)) {
 			p->computed.w = avail->w;           // Get what we asked for
@@ -238,10 +235,7 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 		}
 	} else {
 		if (p->min_size > avail->h) {
-			p->computed.x = -1;             // Too little height
-			p->computed.y = -1;
-			p->computed.w = -1;
-			p->computed.h = -1;
+			p->computed = R_DEAD;            // Too little height
 			p->nts |= N_TOO_LITTLE_SPACE;
 		} else if ((p->max_size >= 0) && (p->max_size < avail->h)) {
 			p->computed.w = p->max_size;    // Get what we asked for
@@ -401,10 +395,7 @@ panel_new (const char *name, Panel *parent, Orientation orient, int visible, int
 	p->notify   = cb_notify;
 	p->window   = NULL;
 
-	p->computed.x = -1;
-	p->computed.y = -1;
-	p->computed.w = -1;
-	p->computed.h = -1;
+	p->computed = R_DEAD;
 
 	if (parent) {
 		panel_add_child (parent, p);

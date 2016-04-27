@@ -75,7 +75,6 @@ exchange_sidebar (Panel *pan)
 int
 main (int argc, char *argv[])
 {
-	// sleep (3);
 	const char *log_file = "log.txt";
 
 	if (argc > 1) {
