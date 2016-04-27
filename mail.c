@@ -27,7 +27,6 @@ draw_window (Panel *p, int colour)
 	gfx_print_at (p->window, 1, 0, p->name);
 }
 
-#endif
 static void
 notify (Panel *p, Notification n)
 {
@@ -44,6 +43,7 @@ notify (Panel *p, Notification n)
 	// }
 }
 
+#endif
 static Panel*
 create_panels (Panel *parent)
 {
@@ -66,7 +66,7 @@ create_panels (Panel *parent)
 				// panel_new ("attach-index",  right,  O_HORIZONTAL,     FALSE,   1,  10);
 				// panel_new ("attach-window", right,  O_HORIZONTAL,     FALSE,   1,  -1);
 
-	mail->notify = notify;
+	// mail->notify = notify;
 	return mail;
 }
 

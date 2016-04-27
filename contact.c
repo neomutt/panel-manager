@@ -4,6 +4,7 @@
 #include "panel.h"
 #include "log.h"
 
+#if 0
 static void
 notify (Panel *panel, Notification n)
 {
@@ -13,18 +14,19 @@ notify (Panel *panel, Notification n)
 	log_message ("mail notify\n");
 }
 
+#endif
 static Panel*
 create_panels (Panel *parent)
 {
 	if (!parent)
 		return NULL;
 
-	Panel *contact   =      panel_new ("contact",  parent,  O_HORIZONTAL, FALSE,  -1, -1);
+	Panel *contact   =      panel_new ("contact",  parent,  O_HORIZONTAL, FALSE,   1, -1);
 
 				panel_new ("groups",   contact, O_VERTICAL,   TRUE,   30, 30);
 				panel_new ("contacts", contact, O_VERTICAL,   TRUE,   10, -1);
 
-	contact->notify = notify;
+	// contact->notify = notify;
 	return contact;
 }
 

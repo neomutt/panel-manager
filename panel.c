@@ -9,8 +9,6 @@
 #include "log.h"
 #include "notify.h"
 
-static Rect R_DEAD = { -1, -1, -1, -1 };
-
 static void
 cb_notify (Panel *panel, Notification flags)
 {
@@ -24,7 +22,7 @@ cb_notify (Panel *panel, Notification flags)
 	char *d = "DELETE ";
 	char *r = "REPAINT ";
 
-	log_message ("%s has changed: flags: %s%s%s%s%s\n",
+	log_message ("%s has changed: %s%s%s%s%s%s\n",
 		panel->name,
 		(flags & N_SIZE_CHANGED) ? s : "",
 		(flags & N_POSN_CHANGED) ? p : "",
@@ -59,7 +57,7 @@ notify_change (Panel *p)
 
 	Notification flags = 0;
 	if (p->visible != p->old_visible) {
-		flags |= N_VISIBLE_CHANGED;
+		flags |= N_VISIBLE;
 	}
 	if (rect_positions_differ (&p->computed, &p->old_computed)) {
 		flags |= N_POSN_CHANGED;
@@ -73,16 +71,78 @@ notify_change (Panel *p)
 	}
 }
 
-BOOL
-send_notification (Panel *p, Notification n)
+#endif
+
+cb_notify_t
+find_notify_callback (Panel *p)
 {
-	if (!p || (n == 0))
+	if (!p)
+		return NULL;
+
+	if (p->notify)
+		return p->notify;
+
+	return find_notify_callback (p->parent);
+}
+
+BOOL
+send_notification (Panel *p, BOOL recurse)
+{
+	if (!p)
 		return FALSE;
+
+	if ((p->nts == 0) && !recurse)
+		return TRUE;
+
+	cb_notify_t cb = find_notify_callback (p);
+	if (!cb)
+		return FALSE;
+
+	cb (p, p->nts);
+	if (!recurse)
+		return TRUE;
+
+	int i;
+	for (i = 0; i < p->count; i++) {
+		if (!send_notification (p->children[i], recurse)) {
+			return FALSE;
+		}
+	}
 
 	return TRUE;
 }
 
-#endif
+
+void
+panel_set_visible2 (Panel *p, BOOL visible)
+{
+	if (!p)
+		return;
+
+	if (visible) {
+		p->nts |=  N_VISIBLE;
+		p->nts &= ~N_HIDDEN;
+	} else {
+		p->nts |=  N_HIDDEN;
+		p->nts &= ~N_VISIBLE;
+	}
+
+	int i;
+	for (i = 0; i < p->count; i++) {
+		panel_set_visible2 (p->children[i], visible);
+	}
+}
+
+void
+panel_set_visible (Panel *p, BOOL visible)
+{
+	if (!p)
+		return;
+
+	p->visible = visible;
+	panel_set_visible2 (p, visible);
+}
+
 BOOL
 panel_is_visible (Panel *p)
 {
@@ -207,7 +267,7 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 		return;
 
 	if (!p->visible) {
-		// notify all children
+		send_notification (p, TRUE);
 		return;
 	}
 
@@ -256,7 +316,7 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 	}
 
 	if (notify && (p->nts != 0)) {
-		// p->notify (p, p->nts);
+		send_notification (p, FALSE);
 	}
 
 	int i;

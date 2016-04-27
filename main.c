@@ -90,11 +90,11 @@ main (int argc, char *argv[])
 
 	signal_init_handlers();
 
-	Panel *global = panel_new ("global", NULL, O_HORIZONTAL, TRUE, -1, -1);
+	Panel *global = panel_new ("global", NULL, O_HORIZONTAL, TRUE, 1, -1);
 	if (!global)
 		return 1;
 
-	Panel *help = panel_new ("help", global, O_VERTICAL, FALSE, -1, -1);
+	Panel *help = panel_new ("help", global, O_VERTICAL, FALSE, 1, -1);
 	if (!help)
 		return 1;
 
@@ -104,7 +104,7 @@ main (int argc, char *argv[])
 	if (!contact_init (global))
 		return 1;
 
-	Rect old = { -1, -1, -1, -1 };
+	Rect old = R_DEAD;
 
 	while (TRUE) {
 		Rect r = gfx_get_rect (NULL);
@@ -115,7 +115,7 @@ main (int argc, char *argv[])
 			panel_dump (global, 0);
 		}
 
-		break;
+		// break;
 
 		// This will block until a key is pressed, or a signal is received.
 		Panel *m = panel_get_by_name (global, "mail");
@@ -123,6 +123,10 @@ main (int argc, char *argv[])
 		// log_message ("Key press: %c (%d)\n", ch, ch);
 		if ((ch == 'q') || (ch < 0)) {
 			break;
+		} else if (ch == 't') {
+			panel_set_visible (m, !m->visible);
+			panel_reflow (global, &r, TRUE);
+			panel_dump (global, 0);
 		} else if (ch == 12) {
 			if (global->notify) {
 				global->notify (global, N_REPAINT);

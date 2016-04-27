@@ -4,6 +4,8 @@
 #include "bool.h"
 #include "rect.h"
 
+Rect R_DEAD = { -1, -1, -1, -1 };
+
 BOOL
 rect_positions_differ (const Rect *a, const Rect *b)
 {

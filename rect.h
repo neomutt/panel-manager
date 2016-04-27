@@ -13,6 +13,8 @@ typedef struct _rect {
 	int h;
 } Rect;
 
+extern Rect R_DEAD;
+
 BOOL rect_positions_differ (const Rect *a, const Rect *b);
 BOOL rect_sizes_differ     (const Rect *a, const Rect *b);
 
