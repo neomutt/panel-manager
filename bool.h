@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Richard Russon <rich@flatcap.org>
+/* Copyright (c) 2015-2016 Richard Russon <rich@flatcap.org>
  * Released under the GPLv3 -- see LICENSE.md for details */
 
 #ifndef _BOOL_H
