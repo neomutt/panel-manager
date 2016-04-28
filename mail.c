@@ -34,7 +34,7 @@ notify (Panel *p, Notification n)
 	if (!p)
 		return;
 
-	log_message ("mail notify %s %d\n", p->name, (int) n);
+	// log_message ("mail notify %s %d\n", p->name, (int) n);
 
 	// if (p->max_size < 0)
 	// 	return;
@@ -43,7 +43,7 @@ notify (Panel *p, Notification n)
 		wipe_window (p);
 		draw_window (p, 6);
 		Rect *r = &p->computed;
-		log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
+		// log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
 	// }
 }
 

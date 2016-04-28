@@ -7,6 +7,8 @@
 #include "rect.h"
 #include "log.h"
 
+WINDOW *focus = NULL;
+
 static void
 init_colours (void)
 {
@@ -123,10 +125,10 @@ gfx_refresh (WINDOW *win)
 }
 
 int
-gfx_get_char (WINDOW *win)
+gfx_get_char (void)
 {
-	if (win) {
-		return wgetch (win);
+	if (focus) {
+		return wgetch (focus);
 	} else {
 		return getch();
 	}
@@ -138,5 +140,12 @@ gfx_clear_screen (WINDOW *win)
 {
 	wclear (win);
 	wrefresh (win);
+}
+
+
+void
+gfx_set_focus (WINDOW *win)
+{
+	focus = win;
 }
 

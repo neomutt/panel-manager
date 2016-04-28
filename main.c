@@ -13,6 +13,7 @@
 
 #include "contact.h"
 #include "mail.h"
+#include "help.h"
 
 #if 0
 static void
@@ -120,6 +121,24 @@ cb_notify (Panel *panel, Notification flags)
 }
 
 
+void
+set_top_level (Panel *global, Panel *show)
+{
+	if (!global || !show)
+		return;
+
+	int i;
+	for (i = 0; i < global->count; i++) {
+		Panel *child = global->children[i];
+		if (child == show) {
+			panel_set_visible (child, TRUE);
+		} else {
+			panel_set_visible (child, FALSE);
+		}
+	}
+}
+
+
 int
 main (int argc, char *argv[])
 {
@@ -145,8 +164,7 @@ main (int argc, char *argv[])
 		return 1;
 	global->notify = cb_notify;
 
-	Panel *help = panel_new ("help", global, O_VERTICAL, FALSE, 1, -1);
-	if (!help)
+	if (!help_init (global))
 		return 1;
 
 	if (!mail_init (global))
@@ -155,6 +173,11 @@ main (int argc, char *argv[])
 	if (!contact_init (global))
 		return 1;
 
+	// Panel *m = panel_get_by_name (global, "mail");
+	// panel_set_visible (m, TRUE);
+	// Panel *i = panel_get_by_name (m, "index-window");
+	// panel_set_focus (i);
+
 	Rect old = R_DEAD;
 
 	while (TRUE) {
@@ -162,6 +185,7 @@ main (int argc, char *argv[])
 
 		if (rect_sizes_differ (&old, &r)) {
 			old = r;
+			log_message ("RECT: %d,%d %dx%d\n", r.x, r.y, r.w, r.h);
 			gfx_wipe_window  (global->window);
 			gfx_close_window (global->window);
 			global->window = gfx_create_window (&r, 1);
@@ -171,17 +195,32 @@ main (int argc, char *argv[])
 			panel_dump (global, 0);
 		}
 
-		Panel *m = panel_get_by_name (global, "mail");
-		Panel *i = panel_get_by_name (global, "index-window");
+		// Panel *i = panel_get_by_name (global, "contacts");
 		// This will block until a key is pressed, or a signal is received.
-		int ch = gfx_get_char (i->window);
+		int ch = gfx_get_char();
 		// log_message ("Key press: %c (%d)\n", ch, ch);
 		if ((ch == 'q') || (ch < 0)) {
 			break;
-		} else if (ch == 't') {
-			panel_set_visible (m, !m->visible);
+		} else if (ch == 'c') {
+			Panel *c = panel_get_by_name (global, "contact");
+			set_top_level (global, c);
 			panel_reflow (global, &r, TRUE);
-			panel_set_repaint (global);
+			gfx_clear_screen (global->window);
+			panel_send_notification (global, TRUE);
+			gfx_refresh (global->window);
+			panel_dump (global, 0);
+		} else if (ch == 'h') {
+			Panel *h = panel_get_by_name (global, "help");
+			set_top_level (global, h);
+			panel_reflow (global, &r, TRUE);
+			gfx_clear_screen (global->window);
+			panel_send_notification (global, TRUE);
+			gfx_refresh (global->window);
+			panel_dump (global, 0);
+		} else if (ch == 'm') {
+			Panel *m = panel_get_by_name (global, "mail");
+			set_top_level (global, m);
+			panel_reflow (global, &r, TRUE);
 			gfx_clear_screen (global->window);
 			panel_send_notification (global, TRUE);
 			gfx_refresh (global->window);

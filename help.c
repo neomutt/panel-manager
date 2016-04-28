@@ -41,7 +41,7 @@ notify (Panel *p, Notification n)
 
 	// if (n & (N_SIZE_CHANGED | N_POSN_CHANGED | N_REPAINT)) {
 		wipe_window (p);
-		draw_window (p, 3);
+		draw_window (p, 2);
 		Rect *r = &p->computed;
 		// log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
 	// }
@@ -53,31 +53,28 @@ create_panels (Panel *parent)
 	if (!parent)
 		return NULL;
 
-	Panel *contact   =      panel_new ("contact",  parent,  O_HORIZONTAL, FALSE,   1, -1);
+	Panel *help   =      panel_new ("help",  parent,  O_HORIZONTAL, FALSE,   1, -1);
 
-				panel_new ("groups",   contact, O_VERTICAL,   TRUE,   30, 30);
-				panel_new ("contacts", contact, O_VERTICAL,   TRUE,   10, -1);
-
-	contact->notify = notify;
-	return contact;
+	help->notify = notify;
+	return help;
 }
 
 
 BOOL
-contact_init (Panel *parent)
+help_init (Panel *parent)
 {
 	if (!parent)
 		return FALSE;
 
-	Panel *contact = create_panels (parent);
-	if (!contact)
+	Panel *help = create_panels (parent);
+	if (!help)
 		return FALSE;
 
 	return TRUE;
 }
 
 void
-contact_shutdown (void)
+help_shutdown (void)
 {
 }
 

@@ -45,5 +45,6 @@ BOOL    panel_is_visible        (Panel *p);
 void    panel_dump              (Panel *p, int indent);
 BOOL    panel_send_notification (Panel *p, BOOL recurse);
 void    panel_set_repaint       (Panel *p);
+BOOL    panel_set_focus         (Panel *p);
 
 #endif /* _PANEL_H_ */

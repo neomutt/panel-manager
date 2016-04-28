@@ -40,7 +40,7 @@ find_notify_callback (Panel *p)
 BOOL
 panel_send_notification (Panel *p, BOOL recurse)
 {
-	log_message ("sn: %s (%d)\n", p->name, recurse);
+	// log_message ("sn: %s (%d)\n", p->name, recurse);
 	if (!p)
 		return FALSE;
 
@@ -480,4 +480,17 @@ panel_get_by_name (Panel *top, const char *name)
 	return match;
 }
 
+
+BOOL
+panel_set_focus (Panel *p)
+{
+	if (!p)
+		return FALSE;
+
+	if (!p->window)
+		return FALSE;
+
+	gfx_set_focus (p->window);
+	return TRUE;
+}
 

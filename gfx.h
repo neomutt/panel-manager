@@ -18,9 +18,10 @@ void     gfx_wipe_window   (WINDOW *win);
 void     gfx_close_window  (WINDOW *win);
 void     gfx_print         (WINDOW *win, const char *msg);
 void     gfx_print_at      (WINDOW *win, int x, int y, const char *msg);
-int      gfx_get_char      (WINDOW *win);
+int      gfx_get_char      (void);
 void     gfx_move          (WINDOW *win, int x, int y);
 void     gfx_refresh       (WINDOW *win);
 void     gfx_clear_screen  (WINDOW *win);
+void     gfx_set_focus     (WINDOW *win);
 
 #endif /* _GFX_H_ */
