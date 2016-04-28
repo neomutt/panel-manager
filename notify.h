@@ -18,4 +18,6 @@ typedef struct _panel Panel;
 
 typedef void (*cb_notify_t) (Panel*, Notification);
 
+char * notify_flags (Notification n);
+
 #endif /* _NOTIFY_H_ */

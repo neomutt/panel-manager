@@ -51,12 +51,17 @@ panel_send_notification (Panel *p, BOOL recurse)
 	if (!cb)
 		return FALSE;
 
-	cb (p, p->nts);
+	if (p->nts != 0) {
+		cb (p, p->nts);
+	}
 	if (!recurse)
 		return TRUE;
 
 	int i;
 	for (i = 0; i < p->count; i++) {
+		if (p->children[i]->nts == 0) {
+			continue;
+		}
 		if (!panel_send_notification (p->children[i], recurse)) {
 			return FALSE;
 		}
@@ -67,26 +72,6 @@ panel_send_notification (Panel *p, BOOL recurse)
 	return TRUE;
 }
 
-
-char *
-notify_flags (Panel *p)
-{
-	static char buffer[10];
-
-	memset (buffer, 0, sizeof (buffer));
-	if (p->nts == 0)
-		return buffer;
-
-	sprintf (buffer, "(%s%s%s%s%s%s)",
-		(p->nts & N_SIZE_CHANGED) ? "S" : "",
-		(p->nts & N_POSN_CHANGED) ? "P" : "",
-		(p->nts & N_VISIBLE)      ? "V" : "",
-		(p->nts & N_HIDDEN)       ? "H" : "",
-		(p->nts & N_DELETED)      ? "D" : "",
-		(p->nts & N_REPAINT)      ? "R" : "");
-
-	return buffer;
-}
 
 void
 panel_set_repaint (Panel *p)
@@ -217,14 +202,10 @@ panel_dump (Panel *p, int indent)
 
 	int colour = 32;	// Default: green
 
-	if ((p->max_size < 0) && (p->count > 0)) {
-		if (panel_is_visible (p)) {
-			colour = 36;	// Structure: cyan
-		} else {
-			colour = 34;	// Hidden: blue
-		}
-	} else if (!panel_is_visible (p)) {
+	if (!panel_is_visible (p)) {
 		colour = 30;	// Hidden: grey
+	} else if ((p->max_size < 0) && (p->count > 0)) {
+		colour = 36;	// Structure: cyan
 	}
 
 	char type = '.';
@@ -245,7 +226,7 @@ panel_dump (Panel *p, int indent)
 		p->computed.y,
 		p->computed.w,
 		p->computed.h,
-		notify_flags (p));
+		notify_flags (p->nts));
 
 	int i;
 	for (i = 0; i < p->count; i++) {

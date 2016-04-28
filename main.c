@@ -95,9 +95,11 @@ cb_notify (Panel *panel, Notification flags)
 		(flags & N_DELETED)      ? d : "",
 		(flags & N_REPAINT)      ? r : "");
 
-	if (!panel->parent) {	// Top-level window
-		gfx_clear_screen (panel->window);
-	}
+	// log_message ("\t%d,%d %dx%d\n", panel->computed.x, panel->computed.y, panel->computed.w, panel->computed.h);
+
+	// if (!panel->parent) {	// Top-level window
+	// 	gfx_clear_screen (panel->window);
+	// }
 
 #if 0
 	if (!panel->parent) {	// Top-level window
@@ -173,10 +175,7 @@ main (int argc, char *argv[])
 	if (!contact_init (global))
 		return 1;
 
-	// Panel *m = panel_get_by_name (global, "mail");
-	// panel_set_visible (m, TRUE);
-	// Panel *i = panel_get_by_name (m, "index-window");
-	// panel_set_focus (i);
+	// panel_dump (global, 0);
 
 	Rect old = R_DEAD;
 
@@ -185,15 +184,20 @@ main (int argc, char *argv[])
 
 		if (rect_sizes_differ (&old, &r)) {
 			old = r;
-			log_message ("RECT: %d,%d %dx%d\n", r.x, r.y, r.w, r.h);
+			// log_message ("RECT: %d,%d %dx%d\n", r.x, r.y, r.w, r.h);
 			gfx_wipe_window  (global->window);
 			gfx_close_window (global->window);
 			global->window = gfx_create_window (&r, 1);
-			panel_reflow (global, &r, TRUE);
-			panel_dump (global, 0);
+			panel_reflow (global, &r, FALSE);
 			panel_send_notification (global, TRUE);
 			panel_dump (global, 0);
+			panel_set_focus (global);
 		}
+
+		// Panel *m = panel_get_by_name (global, "mail");
+		// panel_set_visible (m, TRUE);
+		// Panel *i = panel_get_by_name (m, "index-window");
+		// panel_set_focus (i);
 
 		// Panel *i = panel_get_by_name (global, "contacts");
 		// This will block until a key is pressed, or a signal is received.

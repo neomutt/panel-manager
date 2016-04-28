@@ -59,7 +59,7 @@ gfx_create_window (Rect *r, int colour)
 	}
 	wrefresh (w);
 
-	log_message ("Create win: %d+%d %dx%d (%p)\n", r->x, r->y, r->w, r->h, w);
+	// log_message ("Create win: %d+%d %dx%d (%p)\n", r->x, r->y, r->w, r->h, w);
 	return w;
 }
 
