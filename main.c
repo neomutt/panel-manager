@@ -79,21 +79,7 @@ cb_notify (Panel *panel, Notification flags)
 	if (!panel || (flags == 0))
 		return;
 
-	char *s = "SIZE ";
-	char *p = "POSN ";
-	char *v = "VISIBLE ";
-	char *h = "HIDDEN ";
-	char *d = "DELETE ";
-	char *r = "REPAINT ";
-
-	log_message ("%s has changed: %s%s%s%s%s%s\n",
-		panel->name,
-		(flags & N_SIZE_CHANGED) ? s : "",
-		(flags & N_POSN_CHANGED) ? p : "",
-		(flags & N_VISIBLE)      ? v : "",
-		(flags & N_HIDDEN)       ? h : "",
-		(flags & N_DELETED)      ? d : "",
-		(flags & N_REPAINT)      ? r : "");
+	log_message ("%s has changed: %s\n", panel->name, notify_flags (flags));
 
 	// log_message ("\t%d,%d %dx%d\n", panel->computed.x, panel->computed.y, panel->computed.w, panel->computed.h);
 

@@ -256,24 +256,24 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 		avail = &p->computed;	/* No change to size/posn */
 	}
 
-	if (p->orient == O_HORIZONTAL) {
-		if (p->min_size > avail->w) {
-			p->computed = R_DEAD;            // Too little width
+	if (p->parent && (p->parent->orient == O_VERTICAL)) {
+		if (p->min_size > avail->h) {
+			p->computed = R_DEAD;               // Too little height
 			p->nts |= N_TOO_LITTLE_SPACE;
-		} else if ((p->max_size >= 0) && (p->max_size < avail->w)) {
-			p->computed.w = avail->w;           // Get what we asked for
-			p->computed.h = p->max_size;
+		} else if ((p->max_size >= 0) && (p->max_size < avail->h)) {
+			p->computed.w = p->max_size;        // Get what we asked for
+			p->computed.h = avail->h;
 		} else {
 			p->computed.w = avail->w;           // Use all available space
 			p->computed.h = avail->h;
 		}
 	} else {
-		if (p->min_size > avail->h) {
-			p->computed = R_DEAD;            // Too little height
+		if (p->min_size > avail->w) {
+			p->computed = R_DEAD;               // Too little width
 			p->nts |= N_TOO_LITTLE_SPACE;
-		} else if ((p->max_size >= 0) && (p->max_size < avail->h)) {
-			p->computed.w = p->max_size;    // Get what we asked for
-			p->computed.h = avail->h;
+		} else if ((p->max_size >= 0) && (p->max_size < avail->w)) {
+			p->computed.w = avail->w;           // Get what we asked for
+			p->computed.h = p->max_size;
 		} else {
 			p->computed.w = avail->w;           // Use all available space
 			p->computed.h = avail->h;
@@ -360,6 +360,11 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 		} else {
 			if (p->orient == O_VERTICAL) {
 				size = child->max_size;
+				if (size > remain.h) {
+					child->computed = R_DEAD;
+					child->nts |= N_TOO_LITTLE_SPACE;
+					break;
+				}
 				space.w = remain.w;
 				space.h = size;
 				panel_reflow (child, &space, TRUE);
@@ -367,6 +372,11 @@ panel_reflow (Panel *p, const Rect *avail, BOOL notify)
 				remain.y += size;
 			} else {
 				size = child->max_size;
+				if (size > remain.w) {
+					child->computed = R_DEAD;
+					child->nts |= N_TOO_LITTLE_SPACE;
+					break;
+				}
 				space.w = size;
 				space.h = remain.h;
 				panel_reflow (child, &space, TRUE);
@@ -415,21 +425,16 @@ panel_add_child (Panel *parent, Panel *p)
 Panel *
 panel_new (const char *name, Panel *parent, Orientation orient, int visible, int min, int max)
 {
-	Panel *p = malloc (sizeof (Panel));
+	Panel *p = calloc (1, sizeof (Panel));
 	if (!p)
 		return NULL;
 
 	p->name     = name;
 	p->parent   = parent;
-	p->children = NULL;
-	p->count    = 0;
 	p->orient   = orient;
 	p->visible  = visible;
 	p->min_size = min;
 	p->max_size = max;
-
-	p->notify   = NULL;
-	p->window   = NULL;
 
 	p->computed = R_DEAD;
 

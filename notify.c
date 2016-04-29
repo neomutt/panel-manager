@@ -15,13 +15,14 @@ notify_flags (Notification n)
 	if (n == 0)
 		return buffer;
 
-	sprintf (buffer, "(%s%s%s%s%s%s)",
-		(n & N_SIZE_CHANGED) ? "S" : "",
-		(n & N_POSN_CHANGED) ? "P" : "",
-		(n & N_VISIBLE)      ? "V" : "",
-		(n & N_HIDDEN)       ? "H" : "",
-		(n & N_DELETED)      ? "D" : "",
-		(n & N_REPAINT)      ? "R" : "");
+	sprintf (buffer, "(%s%s%s%s%s%s%s)",
+		(n & N_SIZE_CHANGED)     ? "S" : "",
+		(n & N_POSN_CHANGED)     ? "P" : "",
+		(n & N_VISIBLE)          ? "V" : "",
+		(n & N_HIDDEN)           ? "H" : "",
+		(n & N_DELETED)          ? "D" : "",
+		(n & N_REPAINT)          ? "R" : "",
+		(n & N_TOO_LITTLE_SPACE) ? "<" : "");
 
 	return buffer;
 }

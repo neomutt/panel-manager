@@ -2,6 +2,7 @@
  * Released under the GPLv3 -- see LICENSE.md for details */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "bool.h"
 #include "panel.h"
@@ -39,6 +40,12 @@ notify (Panel *p, Notification n)
 		return;
 
 	log_message ("notify mail/%s %s\n", p->name, notify_flags (n));
+
+	// Don't paint the wrapper windows
+	if ((strcmp (p->name, "mail")        == 0) ||
+	    (strcmp (p->name, "mail-middle") == 0) ||
+	    (strcmp (p->name, "mail-right")  == 0))
+		return;
 
 	// if (p->max_size < 0)
 	// 	return;

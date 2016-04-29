@@ -2,6 +2,7 @@
  * Released under the GPLv3 -- see LICENSE.md for details */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "bool.h"
 #include "panel.h"
@@ -40,10 +41,15 @@ notify (Panel *p, Notification n)
 
 	log_message ("notify contact/%s %s\n", p->name, notify_flags (n));
 
+	// Don't paint the wrapper window
+	if (strcmp (p->name, "contact") == 0)
+		return;
+
 	// if (p->max_size < 0)
 	// 	return;
 
 	// if (n & (N_SIZE_CHANGED | N_POSN_CHANGED | N_REPAINT)) {
+
 		wipe_window (p);
 		draw_window (p, 3);
 		// Rect *r = &p->computed;
