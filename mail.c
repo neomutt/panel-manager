@@ -33,6 +33,18 @@ draw_window (Panel *p, int colour)
 	}
 }
 
+void
+show_text (Panel *p, char *text[])
+{
+	if (!p || !p->window || !text)
+		return;
+
+	int i;
+	for (i = 0; text[i]; i++) {
+		gfx_print_at (p->window, 1, i + 1, text[i]);
+	}
+}
+
 static void
 notify (Panel *p, Notification n)
 {
@@ -53,6 +65,52 @@ notify (Panel *p, Notification n)
 	// if (n & (N_SIZE_CHANGED | N_POSN_CHANGED | N_REPAINT)) {
 		wipe_window (p);
 		draw_window (p, 6);
+		if (strcmp (p->name, "sidebar") == 0) {
+			char *folders[] = {
+				"fruit",
+				"  apple",
+				"  banana",
+				"  cherry",
+				"  damson",
+				"ocean",
+				"  atlantic",
+				"  indian",
+				"  pacific",
+				NULL
+			};
+
+			show_text (p, folders);
+		} else if (strcmp (p->name, "index-window") == 0) {
+			char *mail[] = {
+				" 1   + Apr 10 Ewan Brown      Golden Delicious",
+				" 2   C Apr 11 Grace Hall      Granny Smith",
+				" 3   + Apr 13 Evelyn Rogers   Braeburn",
+				NULL
+			};
+
+			show_text (p, mail);
+		} else if (strcmp (p->name, "pager-window") == 0) {
+			char *mail[] = {
+				"Augue turpis vestibulum ultrices egestas eu auctor curabitur gravida massa",
+				"aliquet volutpat ligula pede pretium. Ornare. Mollis at erat rhoncus malesuada",
+				"mollis. Ligula sit adipiscing ve, malesuada metus diam nonummy at nam urna et",
+				"augue. Eget inceptos pulvinar magna urna erat. Diam cubilia risus parturient",
+				"pede elementum sollicitudin egestas nunc a nisi. Cras donec, cras curabitur",
+				"auctor, nec quisque nibh. Ligula nulla parturient. A, sollicitudin pede, velit",
+				"posuere vel, taciti pulvinar, ve suspendisse. Arcu eros conubia in, pharetra",
+				"egestas venenatis nisi cum. Varius sapien morbi commodo, netus leo curae",
+				"tristique est. Platea senectus. Tortor, id tortor class curae laoreet tortor",
+				"neque. Elementum, fusce neque mollis.",
+				NULL
+			};
+
+			show_text (p, mail);
+		} else if (strcmp (p->name, "help-line") == 0) {
+			gfx_print_at (p->window, 14, 0, "c - Contacts");
+			gfx_print_at (p->window, 29, 0, "h - Help");
+			gfx_print_at (p->window, 40, 0, "m - Mail");
+		}
+
 		// Rect *r = &p->computed;
 		// log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
 	// }

@@ -52,6 +52,26 @@ notify (Panel *p, Notification n)
 
 		wipe_window (p);
 		draw_window (p, 3);
+		if (strcmp (p->name, "groups") == 0) {
+			char *folders[] = {
+				"musicians",
+				"comedians",
+				"weathermen",
+				NULL
+			};
+
+			show_text (p, folders);
+		} else if (strcmp (p->name, "contacts") == 0) {
+			char *mail[] = {
+				"Jimmy Page",
+				"David Bowie",
+				"Ray Charles",
+				NULL
+			};
+
+			show_text (p, mail);
+		}
+
 		// Rect *r = &p->computed;
 		// log_message ("window %s: %d+%d %dx%d\n", p->name, r->x, r->y, r->w, r->h);
 	// }
