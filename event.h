@@ -4,12 +4,15 @@
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
+#include "notify.h"
+
 typedef struct _panel Panel;
 
 enum event_type {
 	E_KEY_PRESS,
 	E_MOUSE_CLICK,
-	E_SIGNAL
+	E_SIGNAL,
+	E_REFLOW
 };
 
 typedef struct _kp {
@@ -30,6 +33,10 @@ typedef struct _mc {
 	int y;
 } MOUSE_CLICK;
 
+typedef struct _r {
+	Notification change;
+} REFLOW;
+
 typedef struct _s {
 	int number;
 } SIGNAL;
@@ -41,6 +48,7 @@ typedef struct _event {
 	union {
 		KEY_PRESS   k;
 		MOUSE_CLICK m;
+		REFLOW      r;
 		SIGNAL      s;
 	};
 } Event;
