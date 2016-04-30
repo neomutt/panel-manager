@@ -12,7 +12,7 @@ OBJDIR	= .obj
 OUT	= panel
 
 SRC	+= contact.c gfx.c help.c log.c mail.c main.c notify.c panel.c rect.c signal.c
-HDR	+= bool.h gfx.h help.h log.h notify.h panel.h rect.h signal.h
+HDR	+= bool.h contact.h event.h gfx.h help.h log.h mail.h notify.h panel.h rect.h signal.h
 
 OBJ	= $(SRC:%.c=$(OBJDIR)/%.o)
 

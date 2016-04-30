@@ -10,6 +10,7 @@
 #include "gfx.h"
 #include "signal.h"
 #include "log.h"
+#include "event.h"
 
 #include "contact.h"
 #include "mail.h"
@@ -108,6 +109,7 @@ cb_notify (Panel *panel, Notification flags)
 #endif
 }
 
+#if 0
 static void
 cb_keypress (Panel *panel, char key)
 {
@@ -117,6 +119,7 @@ cb_keypress (Panel *panel, char key)
 	log_message ("GLOBAL keypress %c (%d)\n", key, (int) key);
 }
 
+#endif
 void
 set_top_level (Panel *global, Panel *show)
 {
