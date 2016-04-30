@@ -20,7 +20,7 @@ hup_catcher (int sig)
 {
 	log_message ("Caught SIGHUP (%d)\n", sig);
 	if (notify_fn) {
-		notify_fn (sig);
+		notify_fn (signal_hup);
 	}
 	// old_hup (sig);
 }
@@ -30,7 +30,7 @@ int_catcher (int sig)
 {
 	log_message ("Caught SIGINT (%d)\n", sig);
 	if (notify_fn) {
-		notify_fn (sig);
+		notify_fn (signal_int);
 	}
 	// old_int (sig);
 }
@@ -40,7 +40,7 @@ usr1_catcher (int sig)
 {
 	log_message ("Caught SIGUSR1 (%d)\n", sig);
 	if (notify_fn) {
-		notify_fn (sig);
+		notify_fn (signal_usr1);
 	}
 	// old_usr1 (sig);
 }
@@ -50,7 +50,7 @@ usr2_catcher (int sig)
 {
 	log_message ("Caught SIGUSR2 (%d)\n", sig);
 	if (notify_fn) {
-		notify_fn (sig);
+		notify_fn (signal_usr2);
 	}
 	// old_usr2 (sig);
 }
@@ -60,7 +60,7 @@ winch_catcher (int sig)
 {
 	log_message ("Caught SIGWINCH (%d)\n", sig);
 	if (notify_fn) {
-		notify_fn (sig);
+		notify_fn (signal_winch);
 	}
 	old_winch (sig);
 }

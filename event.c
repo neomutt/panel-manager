@@ -4,12 +4,12 @@
 #include "log.h"
 #include "signal.h"
 
-int signal_waiting = 0;
+enum signal signal_waiting = signal_none;
 
 void
-cb_signal (int number)
+cb_signal (enum signal number)
 {
-	if (signal_waiting == 0) {
+	if (signal_waiting == signal_none) {
 		signal_waiting = number;
 		log_message ("EVENT: signal %d\n", number);
 	} else {
@@ -20,11 +20,11 @@ cb_signal (int number)
 int
 event_get_signal (void)
 {
-	if (signal_waiting == 0)
-		return 0;
+	if (signal_waiting == signal_none)
+		return signal_none;
 
 	int s = signal_waiting;
-	signal_waiting = 0;
+	signal_waiting = signal_none;
 	return s;
 }
 
