@@ -4,9 +4,11 @@
 #ifndef _CONTACT_H_
 #define _CONTACT_H_
 
+#include "bool.h"
+
 typedef struct _panel Panel;
 
-int  contact_init     (Panel *parent);
+BOOL contact_init     (Panel *parent);
 void contact_shutdown (void);
 
 #endif /* _CONTACT_H_ */

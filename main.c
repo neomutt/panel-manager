@@ -13,8 +13,9 @@
 #include "event.h"
 
 #include "contact.h"
-#include "mail.h"
+#include "global.h"
 #include "help.h"
+#include "mail.h"
 
 #if 0
 static void
@@ -74,52 +75,6 @@ exchange_sidebar (Panel *pan)
 }
 
 #endif
-static void
-cb_notify (Panel *panel, Notification flags)
-{
-	if (!panel || (flags == 0))
-		return;
-
-	log_message ("%s has changed: %s\n", panel->name, notify_flags (flags));
-
-	// log_message ("\t%d,%d %dx%d\n", panel->computed.x, panel->computed.y, panel->computed.w, panel->computed.h);
-
-	// if (!panel->parent) {	// Top-level window
-	// 	gfx_clear_screen (panel->window);
-	// }
-
-#if 0
-	if (!panel->parent) {	// Top-level window
-		if ((panel->computed.x < 0) || (panel->computed.y < 0) || (panel->computed.w < 0) || (panel->computed.h < 0))
-			return;
-
-		if (!panel->window)
-			return;
-
-		int x, y;
-		for (y = 1; y < (panel->computed.h - 1); y++) {
-			gfx_move (panel->window, 1, y);
-			for (x = 1; x < (panel->computed.w - 1); x++) {
-				gfx_print (panel->window, ".");
-			}
-		}
-		gfx_refresh (panel->window);
-		sleep (2);
-	}
-#endif
-}
-
-#if 0
-static void
-cb_keypress (Panel *panel, char key)
-{
-	if (!panel)
-		return;
-
-	log_message ("GLOBAL keypress %c (%d)\n", key, (int) key);
-}
-
-#endif
 void
 set_top_level (Panel *global, Panel *show)
 {
@@ -158,10 +113,9 @@ main (int argc, char *argv[])
 
 	event_init();
 
-	Panel *global = panel_new ("global", NULL, O_HORIZONTAL, TRUE, 1, -1);
+	Panel *global = global_init();
 	if (!global)
 		return 1;
-	global->notify = cb_notify;
 
 	if (!help_init (global))
 		return 1;

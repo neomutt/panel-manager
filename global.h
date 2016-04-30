@@ -1,12 +1,11 @@
 /* Copyright (c) 2015-2016 Richard Russon <rich@flatcap.org>
  * Released under the GPLv3 -- see LICENSE.md for details */
 
-#ifndef _HELP_H_
-#define _HELP_H_
+#ifndef _GLOBAL_H_
+#define _GLOBAL_H_
 
 typedef struct _panel Panel;
 
-BOOL help_init     (Panel *parent);
-void help_shutdown (void);
+Panel * global_init (void);
 
-#endif /* _HELP_H_ */
+#endif /* _GLOBAL_H_ */
