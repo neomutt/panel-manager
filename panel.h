@@ -28,6 +28,7 @@ typedef struct _panel {
 	int max_size;
 	Notification nts;	/* notifications to send */
 	cb_notify_t notify;
+	cb_keypress_t keypress;
 	WINDOW *window;
 } Panel;
 

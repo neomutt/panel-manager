@@ -108,6 +108,14 @@ cb_notify (Panel *panel, Notification flags)
 #endif
 }
 
+static void
+cb_keypress (Panel *panel, char key)
+{
+	if (!panel)
+		return;
+
+	log_message ("GLOBAL keypress %c (%d)\n", key, (int) key);
+}
 
 void
 set_top_level (Panel *global, Panel *show)

@@ -116,6 +116,15 @@ notify (Panel *p, Notification n)
 	// }
 }
 
+static void
+keypress (Panel *p, char key)
+{
+	if (!p)
+		return;
+
+	log_message ("MAIL keypress %c (%d)\n", key, (int) key);
+}
+
 static Panel*
 create_panels (Panel *parent)
 {
@@ -131,14 +140,15 @@ create_panels (Panel *parent)
 				panel_new ("sidebar",       middle, O_VERTICAL,   TRUE,   20,  20);
 	Panel *right    =       panel_new ("mail-right",    middle, O_VERTICAL,   TRUE,    1,  -1);
 
-				panel_new ("index-window",  right,  O_HORIZONTAL,     TRUE,   10,  10);
+				panel_new ("index-window",  right,  O_HORIZONTAL,     TRUE,   10,  -1);
 				panel_new ("index-status",  right,  O_HORIZONTAL,     TRUE,    1,   1);
-				panel_new ("pager-window",  right,  O_HORIZONTAL,     TRUE,    1,  -1);
-				panel_new ("pager-status",  right,  O_HORIZONTAL,     TRUE,    1,   1);
+				// panel_new ("pager-window",  right,  O_HORIZONTAL,     TRUE,    1,  -1);
+				// panel_new ("pager-status",  right,  O_HORIZONTAL,     TRUE,    1,   1);
 				// panel_new ("attach-index",  right,  O_HORIZONTAL,     FALSE,   1,  10);
 				// panel_new ("attach-window", right,  O_HORIZONTAL,     FALSE,   1,  -1);
 
-	mail->notify = notify;
+	mail->notify   = notify;
+	mail->keypress = keypress;
 	return mail;
 }
 

@@ -16,7 +16,8 @@ typedef enum {
 
 typedef struct _panel Panel;
 
-typedef void (*cb_notify_t) (Panel*, Notification);
+typedef void (*cb_notify_t)   (Panel*, Notification);
+typedef void (*cb_keypress_t) (Panel*, char key);
 
 char * notify_flags (Notification n);
 
