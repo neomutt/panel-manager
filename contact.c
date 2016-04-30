@@ -34,6 +34,18 @@ draw_window (Panel *p, int colour)
 }
 
 static void
+show_text (Panel *p, char *text[])
+{
+	if (!p || !p->window || !text)
+		return;
+
+	int i;
+	for (i = 0; text[i]; i++) {
+		gfx_print_at (p->window, 1, i + 1, text[i]);
+	}
+}
+
+static void
 notify (Panel *p, Notification n)
 {
 	if (!p)

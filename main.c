@@ -156,7 +156,7 @@ main (int argc, char *argv[])
 
 	gfx_init();
 
-	signal_init_handlers();
+	event_init();
 
 	Panel *global = panel_new ("global", NULL, O_HORIZONTAL, TRUE, 1, -1);
 	if (!global)
@@ -200,8 +200,15 @@ main (int argc, char *argv[])
 		// This will block until a key is pressed, or a signal is received.
 		int ch = gfx_get_char();
 		// log_message ("Key press: %c (%d)\n", ch, ch);
-		if ((ch == 'q') || (ch < 0)) {
+		if (ch == 'q') {
 			break;
+		} else if (ch < 0) {
+			int i = event_get_signal();
+			if (i > 0) {
+				log_message ("Signal: %d\n", i);
+			} else {
+				log_message ("UNKNOWN event: %d\n", ch);
+			}
 		} else if (ch == 'c') {
 			Panel *c = panel_get_by_name (global, "contact");
 			set_top_level (global, c);

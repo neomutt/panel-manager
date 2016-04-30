@@ -45,4 +45,7 @@ typedef struct _event {
 	};
 } Event;
 
+void event_init       (void);
+int  event_get_signal (void);
+
 #endif /* _EVENT_H_ */

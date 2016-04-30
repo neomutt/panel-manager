@@ -4,6 +4,8 @@
 #ifndef _SIGNAL_H_
 #define _SIGNAL_H_
 
-void signal_init_handlers (void);
+typedef void (*cb_signal_t) (int number);
+
+void signal_init_handlers (cb_signal_t notify);
 
 #endif /* _SIGNAL_H_ */

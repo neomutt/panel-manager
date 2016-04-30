@@ -33,7 +33,7 @@ draw_window (Panel *p, int colour)
 	}
 }
 
-void
+static void
 show_text (Panel *p, char *text[])
 {
 	if (!p || !p->window || !text)
